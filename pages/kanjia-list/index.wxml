@@ -1,0 +1,21 @@
+<view class="container {{iphone}}">
+  <view class="header-container">
+    <navigator open-type="navigateBack" delta="1" hover-class="navigator-hover">
+      <image class="goback" src="../../images/goback.png" />
+    </navigator>
+    <view class="header-name">砍价列表</view>
+  </view>
+  <view class="kanjia-list" wx:for="{{kanjialist}}" wx:key="{{index}}" bindtap="gokj" data-id="{{item.goodsId}}">
+    <image class="goods" src="{{pics[item.goodsId].pic}}" />
+    <view class="list-box">
+      <view class="list-box-title">{{pics[item.goodsId].name}}</view>
+      <view class="list-box-info">{{pics[item.goodsId].characteristic}}</view>
+      <view class="list-box-kjmin">
+        <text>¥{{item.minPrice}}</text>最低价</view>
+      <view class="list-box-kjmax">
+        <text>¥{{item.originalPrice}}</text>原价</view>
+      <view class="list-box-sales">
+        <text>{{item.number}}</text>限量</view>
+    </view>
+  </view>
+</view>

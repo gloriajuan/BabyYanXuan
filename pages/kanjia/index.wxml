@@ -1,0 +1,135 @@
+<view class="container {{iphone}}">
+  <view class="header-container">
+    <navigator wx:if="{{share}}" open-type="switchTab" url="/pages/index/index" hover-class="navigator-hover">
+      <image class="goback" src="../../images/gohome.png" />
+    </navigator>
+    <navigator wx:if="{{!share}}" open-type="navigateBack" delta="1" hover-class="navigator-hover">
+      <image class="goback" src="../../images/goback.png" />
+    </navigator>
+  </view>
+  <view class="kanjia-header">
+    <view class="kanjia-header-user">
+      <image class="user-avatar" src="{{kanjiaInfo.joiner.avatarUrl}}" />
+      <view class="user-name">{{kanjiaInfo.joiner.nick}}</view>
+      <view class="user-info">我发现一件好货，来帮我砍到最低价吧～</view>
+    </view>
+    <view class="kanjia-header-goods" bindtap="getgoods">
+      <image class="goods-image" src="{{goodsDetail.basicInfo.pic}}" />
+      <view class="goods-info">
+        <view class="goods-title">{{goodsDetail.basicInfo.name}}</view>
+        <view class="goods-min">底价
+          <text>¥{{kanjiaInfo.kanjiaInfo.minPrice}}</text>
+        </view>
+        <view class="good-max">原价
+          <text>¥{{OriPrice}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="kanjia-header-btn">
+      <view class="btn-info">
+        当前价
+        <text class="min">{{kjcurPrice}}</text>元， 已砍
+        <text class="min">{{onPrice}}</text>元
+      </view>
+      <!--砍价未成功显示-->
+      <view class="btn-two" wx:if="{{kanjiaInfo.kanjiaInfo.statusStr != '完成'}}">
+        <view class="btn-he" bindtap="helpKanjia" wx:if="{{!kanjiaInfoMyHelp && userID != kanjiaInfo.kanjiaInfo.uid}}">帮好友砍一刀</view>
+        <view class="btn-he" bindtap="helpKanjia" wx:if="{{!kanjiaInfoMyHelp && userID == kanjiaInfo.kanjiaInfo.uid}}">自己先砍一刀</view>
+        <view class="btn-he btn-he-no" wx:if="{{kanjiaInfoMyHelp && userID != kanjiaInfo.kanjiaInfo.uid}}">已帮好友砍 {{kanjiaInfoMyHelp.cutPrice}} 元</view>
+        <view class="btn-he btn-he-no" bindtap="gopay" wx:if="{{kanjiaInfoMyHelp && userID == kanjiaInfo.kanjiaInfo.uid}}">以当前价购买</view>
+        <view class="btn-me" bindtap="getshare" wx:if="{{userID == kanjiaInfo.kanjiaInfo.uid}}">邀请好友砍价</view>
+        <view class="btn-me" bindtap="getkanjia" wx:if="{{userID != kanjiaInfo.kanjiaInfo.uid}}">我也要砍价</view>
+      </view>
+      <view class="btn-two" wx:if="{{kanjiaInfo.kanjiaInfo.statusStr == '完成'}}">
+        <!--砍价成功显示-->
+        <view class="btn-succse" bindtap="gopay" wx:if="{{userID == kanjiaInfo.kanjiaInfo.uid}}">商品已经砍价成功,去付款</view>
+        <view class="btn-succse btn-he-no" bindtap="getkanjia" wx:if="{{userID != kanjiaInfo.kanjiaInfo.uid}}">好友已经砍价成功，我也要砍价</view>
+      </view>
+      <view wx:if="{{kanjiaInfo.kanjiaInfo.statusStr != '完成'}}" class="kanjia-info-times">
+        <text wx:if="{{countDownDay != 00}}" class="day">{{countDownDay}}</text>
+        <text wx:if="{{countDownDay != 00}}" class="ac">:</text>
+        <text wx:if="{{countDownHour != 00}}" class="hou">{{countDownHour}}</text>
+        <text wx:if="{{countDownHour != 00}}" class="ac">:</text>
+        <text class="min">{{countDownMinute}}</text>
+        <text class="ac">:</text>
+        <text class="con">{{countDownSecond}}</text>
+      </view>
+    </view>
+  </view>
+  <view class="kanjia-active">
+    <text></text>
+  </view>
+  <view class="kanjia-help">
+    <view class="kanjia-help-title">
+      <text>{{kanjiaInfo.kanjiaInfo.helpNumber}}</text>名好友帮砍
+    </view>
+    <view class="kanjia-help-list" wx:for="{{kanjiaInfo.helps}}" wx:key="id">
+      <image class="avatar" src="{{item.avatarUrl}}" />
+      <view class="help-list-info">
+        <view class="list-info-name">{{item.nick}}</view>
+        <view class="list-info-time">{{item.dateAdd}}</view>
+      </view>
+      <view class="help-info-money">
+        <image src="../../images/kanjia/kanjia.png" />
+        <view class="kjmoney">砍掉
+          <text>{{item.cutPrice}}</text>元</view>
+      </view>
+    </view>
+  </view>
+  <!--/******* 弹窗组件 *******/-->
+  <!--发起砍价弹窗-->
+  <view class="show-pop" hidden="{{kanjiashare}}">
+    <view class="show-pop-box">
+      <image class="pop-box-close" src="../../images/kanjia/close.png" bindtap="closeShare" />
+      <view class="pop-box-info">
+        <view class="pop-box-title">恭喜</view>
+        <view class="pop-box-kanjia">砍价创建成功</view>
+        <view class="pop-box-text">快邀请好友来砍价吧～</view>
+      </view>
+      <view class="pop-box-share">
+        <button class="pop-box-btn" open-type="share"></button>
+        <view class="share-user">
+          <image src="../../images/kanjia/share_user.png" />邀请好友
+        </view>
+        <view class="share-img" bindtap="showposter">
+          <image src="../../images/kanjia/share_img.png" />生成二维码
+        </view>
+      </view>
+    </view>
+  </view>
+  <!--生成封面弹窗-->
+  <view class="show-pop" hidden="{{postershow}}" bindtap="closecode">
+    <view class="banner-pop">
+      <image class="qr-code" mode="widthFix" src="{{codeimg}}" />
+      <view class="banner-btn" bindtap="saveposter">保存二维码</view>
+    </view>
+  </view>
+  <!--受邀砍价弹窗-->
+  <view class="show-pop" wx:if="{{userID != kanjiaInfo.kanjiaInfo.uid && kanjiaInfo.kanjiaInfo.statusStr != '完成'}}" hidden="{{helpkanjiashare}}">
+    <view class="show-share-box">
+      <image class="share-box-close" src="../../images/kanjia/close.png" bindtap="closeHelp" />
+      <image class="share-box-avatar" src="{{kanjiaInfo.joiner.avatarUrl}}" />
+      <view class="share-box-name">{{kanjiaInfo.joiner.nick}}</view>
+      <view class="share-box-text">邀请您帮TA一起砍价</view>
+      <view class="share-box-btn" bindtap="helpKanjia">帮砍一刀</view>
+    </view>
+  </view>
+</view>
+<view class="show-container" hidden="{{wxlogin}}">
+  <view class="show-box">
+    <view class="show-logo-box">
+      <image src="{{toplogo}}" />
+      <view class="show-mall-name">{{topname}}</view>
+    </view>
+    <view class="show-text-box">
+      <view class="show-text-name">需要您的授权才能正常使用哦！</view>
+      <view class="show-text-info">
+        <text>·</text>请允许我们获得您的公开资讯</view>
+      <view class="show-text-info">
+        <text>·</text>我们不会公布您的这些信息</view>
+      <view class="show-text-info">
+        <text>·</text>只是为了给您提供更好的服务</view>
+    </view>
+    <button open-type="getUserInfo" bindgetuserinfo="userlogin">允许</button>
+  </view>
+</view>

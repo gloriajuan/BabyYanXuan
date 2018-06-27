@@ -1,0 +1,69 @@
+<view class="container">
+	<view class="userinfo">
+    <open-data class="userinfo-avatar" type="userAvatarUrl"></open-data>
+    <view class="iser-info-box">
+      <open-data class="userinfo-nickname" type="userNickName"></open-data>
+      <text class="userinfo-score" bindtap="score">积分：{{score}}</text>
+      <text wx:if="{{userInfo && score_sign_continuous == 0}}" class="userinfo-score-day" bindtap="score">今日未签到</text>
+      <text wx:if="{{userInfo && score_sign_continuous > 0}}" class="userinfo-score-day">已连续签到{{score_sign_continuous}}天</text>
+    </view>
+    <button  wx:if="{{!userInfo}}" open-type="getUserInfo"></button>
+	</view>
+  <view class="userinfo-item">
+    <image src="../../images/profile_dfunding.png"></image>
+    <navigator url="/pages/order-list/index" hover-class="none">我的订单</navigator>
+  </view>
+  <view class="user-cart-list">
+    <view class="cart-list" bindtap="goorderlist" data-index="0">
+      <view class="{{tabClass[0]}}"></view>
+      <image src="../../images/order-details/orderform_pay.png"></image>
+      待付款
+    </view>
+    <view class="cart-list" bindtap="goorderlist" data-index="1">
+      <view class="{{tabClass[1]}}"></view>
+      <image src="../../images/order-details/orderform_ship.png"></image>
+      待发货
+    </view>
+    <view class="cart-list" bindtap="goorderlist" data-index="2">
+      <view class="{{tabClass[2]}}"></view>
+      <image src="../../images/order-details/delivering.png"></image>
+      待收货
+    </view>
+    <view class="cart-list" bindtap="goorderlist" data-index="3">
+      <view class="{{tabClass[3]}}"></view>
+      <image src="../../images/order-details/orderform.png"></image>
+      待评价
+    </view>
+  </view>
+  <view class="userinfo-item-box">
+    <view class="userinfo-item" bindtap="withdraw">
+      <image src="../../images/profile_tegral.png"></image>
+      <text>{{balance}}元</text>
+      <navigator hover-class="none">我的余额</navigator>
+    </view>
+    <view class="userinfo-item" bindtap="mykanjia">
+      <image src="../../images/kanjia/kjico.png"></image>
+      <navigator hover-class="none">我的砍价</navigator>
+    </view>
+    <view class="userinfo-item" bindtap="mycoupons">
+      <image src="../../images/profile_ticket.png"></image>
+      <navigator hover-class="none">我的礼券</navigator>
+    </view>
+    <view class="userinfo-item" bindtap="favlist">
+      <image src="../../images/profile_collection.png"></image>
+      <navigator hover-class="none">我的收藏</navigator>
+    </view>
+    <view class="userinfo-item" bindtap="address">
+      <image src="../../images/profile_address.png"></image>
+      <navigator hover-class="none">我的地址</navigator>
+    </view>
+    <view class="userinfo-item">
+      <image src="../../images/profile_service.png"></image>
+      <navigator hover-class="none">联系客服</navigator>
+      <button open-type="contact" session-from="weapp"></button>
+    </view>
+  </view>
+  <view class="userinfo-info">
+    {{getInfo}}
+  </view>
+</view>

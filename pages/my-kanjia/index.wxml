@@ -1,0 +1,25 @@
+<view class="container {{iphone}}">
+  <view class="header-container">
+    <navigator open-type="navigateBack" delta="1" hover-class="navigator-hover">
+      <image class="goback" src="../../images/goback.png" />
+    </navigator>
+    <view class="header-name">我的砍价</view>
+  </view>
+  <view class="tab-container">
+    <view class="tab-item-list" wx:for="{{kjgoods}}" wx:key="{{index}}">
+      <image src="{{pics[item.goodsId].pic}}" />
+      <view class="tab-item-list-info" bindtap="gokj" data-id="{{item.kjId}}">
+        <view class="list-info-title">{{pics[item.goodsId].name}}</view>
+        <view class="list-info-money">
+          <view class="money-min">当前价格：
+            <text>¥{{item.curPrice}}</text>
+          </view>
+          <view class="money-max">原价：
+            <text>¥{{pics[item.goodsId].originalPrice}}</text>
+          </view>
+        </view>
+        <view class="list-info-info">{{item.statusStr}}</view>
+      </view>
+    </view>
+  </view>
+</view>

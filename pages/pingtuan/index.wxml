@@ -1,0 +1,175 @@
+<view class="container {{iphone}}">
+  <view class="header-container">
+    <navigator wx:if="{{share}}" open-type="switchTab" url="/pages/index/index" hover-class="navigator-hover">
+      <image class="goback" src="../../images/gohome.png" />
+    </navigator>
+    <navigator wx:if="{{!share}}" open-type="navigateBack" delta="1" hover-class="navigator-hover">
+      <image class="goback" src="../../images/goback.png" />
+    </navigator>
+    <view class="header-name">拼团详情</view>
+  </view>
+  <view class="goods-box" bindtap="goodsTap">
+    <image src="{{goodsDetail.basicInfo.pic}}" />
+    <view class="goods-info">
+      <view class="goods-title">{{goodsDetail.basicInfo.name}}</view>
+      <view class="goods-text">{{goodsDetail.basicInfo.characteristic}}</view>
+      <view class="goods-tuan">{{ptuanSet.numberPersion}}人团
+        <text>Ұ {{goodsDetail.basicInfo.pingtuanPrice}}</text>
+      </view>
+    </view>
+  </view>
+  <block wx:if="{{pingList}}">
+    <view class="pingtuan-box">
+      <view class="pingtuan-info-box">
+        <view class="line"></view>
+        <view class="pingtuan-info">
+          <image src="{{pingList.apiExtUser.avatarUrl}}" />
+          <text>团长</text>
+          <view class="pingtuan-info-name">
+            {{pingList.apiExtUser.nick}}
+          </view>
+        </view>
+        <view class="pingtuan-info">
+          <image src="../../images/pingtuan/user.png" />
+        </view>
+      </view>
+      <view class="pingtuan-info-number">
+        还差
+        <text>{{ptuanSet.numberPersion - pingList.helpNumber}}</text>人成团，快来一起拼团吧～
+      </view>
+      <view class="pingtuan-info-times">
+        <text class="lin-l"></text>剩余
+        <text wx:if="{{countDownDay != 00}}" class="day">{{countDownDay}}</text>
+        <text wx:if="{{countDownDay != 00}}">:</text>
+        <text wx:if="{{countDownHour != 00}}" class="hou">{{countDownHour}}</text>
+        <text wx:if="{{countDownHour != 00}}">:</text>
+        <text wx:if="{{countDownMinute != 00}}" class="min">{{countDownMinute}}</text>
+        <text wx:if="{{countDownMinute != 00}}">:</text>
+        <text class="con">{{countDownSecond}}</text> 结束
+        <text class="lin-r"></text>
+      </view>
+    </view>
+  </block>
+  <block wx:if="{{!pingList}}">
+    <view class="vitery-ptuan-box">
+      <view class="vitery-ptuan">好友已经拼团成功~</view>
+      <view class="vitery-ptuan-btn" bindtap="goodsTap">我也要发起拼团</view>
+    </view>
+  </block>
+  <block wx:if="{{pingList}}">
+    <view class="ptuan-joiner-box">
+      <view class="ptuan-joiner-list" wx:for="{{ptuaninfo}}" wx:key="id">
+        <image src="{{item.apiExtUserHelp.avatarUrl}}" />
+        <view class="joiner-name">{{item.apiExtUserHelp.nick}}</view>
+        <view class="joiner-time">{{item.dateAdd}}</view>
+        <view wx:if="{{item.uidHelp == ktid}}" class="btn">团长</view>
+        <view wx:if="{{item.uidHelp != ktid}}" class="btn l">团员</view>
+      </view>
+    </view>
+    <block wx:if="{{userId != ktid}}">
+      <view class="footer">
+        <view class="home" bindtap="getshare">
+          <image src="../../images/share.png" />
+          <text>分享</text>
+        </view>
+        <view wx:if="{{ptuaninfoUs}}" class="goPingtuan">
+          我已参团 | 请等待拼团成功
+        </view>
+        <view wx:if="{{!ptuaninfoUs}}" class="goPingtuan" bindtap="pingtuan">
+          Ұ {{goodsDetail.basicInfo.pingtuanPrice}} | 我也要参团
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{userId == ktid}}">
+      <view class="footer">
+        <view class="home" bindtap="gohome">
+          <image src="../../images/nav/home-on.png" />
+          <text>去首页</text>
+        </view>
+        <view class="goPingtuan" bindtap="getshare">邀请好友拼团</view>
+      </view>
+    </block>
+  </block>
+  <view class="show-popup" hidden="{{hideShopPopup}}">
+    <view class="popup-mask" bindtap="closePopupTap"></view>
+    <view class="popup-contents">
+      <view class="pop-goods-info">
+        <view class="pop-img-box">
+          <image src="{{goodsDetail.basicInfo.pic}}" class="goods-thumbnail" />
+        </view>
+        <view class="pop-goods-des">
+          <view class="pop-goods-title">{{goodsDetail.basicInfo.name}}</view>
+          <view class="pop-goods-price" wx:if="{{shopType =='addShopCar' || shopType =='tobuy'}}">¥ {{selectSizePrice}}</view>
+          <view class="pop-goods-price" wx:if="{{shopType =='pingtuan'}}">¥ {{selectptPrice}}</view>
+        </view>
+        <view class="pop-goods-close" bindtap="closePopupTap"></view>
+      </view>
+      <view class="size-label-box">
+        <block wx:for="{{goodsDetail.properties}}" wx:for-item="property" wx:for-index="idx" wx:key="id">
+          <view class="label">{{property.name}}</view>
+          <view class="label-item-box">
+            <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{property.childsCurGoods}}" wx:key="id" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{property.id}}" data-propertyname="{{property.name}}" data-propertychildindex="{{index}}"
+              data-propertychildid="{{item.id}}" data-propertychildname="{{item.name}}">
+              {{item.name}}
+            </view>
+          </view>
+        </block>
+      </view>
+      <view class="buy-num-box">
+        <view class="num-label">购买数量</view>
+        <view class="num-box">
+          <view class="num-jian {{buyNumber == buyNumMin ? 'hui': ''}}" bindtap="numJianTap">-</view>
+          <view class="num-input">
+            <input type="number" value="{{buyNumber}}" disabled/>
+          </view>
+          <view class="num-jia {{buyNumber== buyNumMax ? 'hui': ''}}" bindtap="numJiaTap">+</view>
+        </view>
+      </view>
+      <view class="popup-join-btn" wx:if="{{shopType =='pingtuan'}}" bindtap="buyPingtuan">立即参团</view>
+    </view>
+  </view>
+</view>
+<view class="show-container" hidden="{{wxlogin}}">
+  <view class="show-box">
+    <view class="show-logo-box">
+      <image src="{{toplogo}}" />
+      <view class="show-mall-name">{{topname}}</view>
+    </view>
+    <view class="show-text-box">
+      <view class="show-text-name">需要您的授权才能正常使用哦！</view>
+      <view class="show-text-info">
+        <text>·</text>请允许我们获得您的公开资讯</view>
+      <view class="show-text-info">
+        <text>·</text>我们不会公布您的这些信息</view>
+      <view class="show-text-info">
+        <text>·</text>只是为了给您提供更好的服务</view>
+    </view>
+    <button open-type="getUserInfo" bindgetuserinfo="userlogin">允许</button>
+  </view>
+</view>
+<view class="show-share" hidden="{{sharebox}}">
+  <view class="show-close-share" bindtap="closeshare"></view>
+  <view class="show-share-box">
+    <view class="show-share-title">邀请好友来拼团</view>
+    <view class="show-share-btn-box">
+      <view class="show-share-share">
+        <image src="../../images/kanjia/share_user.png" />
+        <text>邀请好友</text>
+        <button class="pop-box-btn" open-type="share"></button>
+      </view>
+      <view class="show-share-code" bindtap="getcode">
+        <image src="../../images/kanjia/share_img.png" />
+        <text>生成二维码</text>
+      </view>
+    </view>
+  </view>
+</view>
+<view class="show-share" hidden="{{sharecode}}">
+  <view class="show-close-share" bindtap="closeshare"></view>
+  <view class="show-code-box">
+    <view class="show-code-re">
+      <image src="{{codeimg}}" />
+      <view class="show-code-btn" bindtap="savecode">保存拼团二维码</view>
+    </view>
+  </view>
+</view>

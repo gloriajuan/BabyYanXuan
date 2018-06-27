@@ -1,0 +1,26 @@
+<view class="container {{iphone}}">
+  <view class="header-container">
+    <navigator open-type="navigateBack" delta="1" hover-class="navigator-hover">
+      <image class="goback" src="../../images/goback.png" />
+    </navigator>
+    <view class="header-name">拼团列表</view>
+  </view>
+  <view class="pingtuan-list" wx:for="{{ptgoods}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.id}}">
+    <view class="pingtuan-image">
+      <image src="{{item.pic}}" />
+    </view>
+    <view class="pingtuan-info">
+      <view class="pingtuan-title">{{item.name}}</view>
+      <view class="pingtuan-tetx">{{item.characteristic}}</view>
+      <view class="pingtuan-sales">已团
+        <text>{{pics[item.id].numberSucccess}}</text>件</view>
+      <view class="pingtuan-old-money">单独购买
+        <text>Ұ{{item.minPrice}}</text>
+      </view>
+      <view class="pingtuan-new-money">
+        <text>{{pics[item.id].numberPersion}}人团 Ұ</text>{{item.pingtuanPrice}}
+      </view>
+      <view class="pingtuan-btn">去拼团</view>
+    </view>
+  </view>
+</view>
