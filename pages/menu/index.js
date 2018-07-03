@@ -86,28 +86,32 @@ Page({
       }
     })
     wx.request({
-      url: app.globalData.urls + '/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'goods'
+      url: app.globalData.urls + '/MyBill.asmx/GetMyFirstType',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           that.setData({
-            banners: res.data.data
+            banners: res.data.obj
           });
         }
       }
     }),
     wx.request({
-      url: app.globalData.urls + '/shop/goods/category/all',
+      url: app.globalData.urls + '/MyBill.asmx/GetMyFirstType',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       success: function (res) {
-        var categories = [{ id: 0, name: "所有分类" }];
-        if (res.data.code == 0) {
+        var categories = [{ Id: 0, Name: "所有分类" }];
+        if (res.data.state == 1) {
           wx.hideLoading();
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].level == 1) {
-              categories.push(res.data.data[i]);
+          for (var i = 0; i < res.data.obj.length; i++) {
+            if (res.data.obj[i].PId == 0) {
+              categories.push(res.data.obj[i]);
             }
           }
         }//
@@ -120,25 +124,32 @@ Page({
     })
   },
   getGoodsList: function (categoryId) {
-    if (categoryId == 0) {
-      categoryId = "";
-    }
+    // if (categoryId == 0) {
+    //   categoryId = "";
+    // }
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/category/all',
+      url: app.globalData.urls + '/MyBill.asmx/GetMySecondType',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data:{
+        FirstTypeId:categoryId
+      },
       success: function (res) {
         var categorieslist = [];
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (categoryId != '') {
-              if (res.data.data[i].pid == categoryId) {
-                categorieslist.push(res.data.data[i]);
+        if (res.data.state == 1) {
+          for (var i = 0; i < res.data.obj.length; i++) {
+            if (categoryId != 0) {
+              if (res.data.obj[i].PId == categoryId) {
+                categorieslist.push(res.data.obj[i]);
               }
             } else {
-              //categorieslist.push(res.data.data[i]);
-              if (res.data.data[i].pid != 0) {
-                categorieslist.push(res.data.data[i]);
-              }
+              categorieslist.push(res.data.obj[i]);
+              // if (res.data.data[i].PId != 0) {
+              //   categorieslist.push(res.data.obj[i]);
+              // }
             }
           }
         }//

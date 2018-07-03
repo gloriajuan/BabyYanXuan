@@ -8,9 +8,9 @@
   </view>
   <view class="type-container-boxx">
     <view class="type-container">
-      <view wx:for-items="{{categories}}" wx:key="id" class="type-box" bindtap="tabClick" id="{{item.id}}">
-        <view class="type-navbar-item {{activeCategoryId == item.id ? 'type-item-on' : ''}}">
-          {{item.name}}
+      <view wx:for-items="{{categories}}" wx:key="id" class="type-box" bindtap="tabClick" id="{{item.Id}}">
+        <view class="type-navbar-item {{activeCategoryId == item.Id ? 'type-item-on' : ''}}">
+          {{item.Name}}
         </view>
       </view>
     </view>
@@ -19,7 +19,7 @@
         <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
           <block wx:for="{{banners}}" wx:key="id">
             <swiper-item>
-              <image bindtap="toDetailsTap" data-id="{{item.businessId}}" src="{{item.picUrl}}_m" class="slide-image" mode="widthFix" />
+              <image bindtap="toDetailsTap" data-id="{{item.Id}}" src="{{item.ImgUrl}}" class="slide-image" mode="widthFix" />
             </swiper-item>
           </block>
         </swiper>
@@ -31,9 +31,9 @@
       </view>
       <view if="{{item.level == 2}}" class="type-menu">
         <view class="type-level-box" wx:for-items="{{categorieslist}}" wx:key="id">
-          <view id="{{item.id}}" class="type-level-item " bindtap="levelClick" data-id="{{item.id}}">
-            <image class="type-img" src="{{item.icon}}" mode="widthFix"></image>
-            <text>{{item.name}}</text>
+          <view id="{{item.Id}}" class="type-level-item " bindtap="levelClick" data-id="{{item.Id}}">
+            <image class="type-img" src="{{item.ImgUrl}}" mode="widthFix"></image>
+            <text>{{item.Name}}</text>
           </view>
         </view>
       </view>

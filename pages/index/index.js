@@ -158,14 +158,18 @@ Page({
     })
     //首页幻灯片
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/MyBill.asmx/GetMyBill',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        type: 'home'
+        TypeId: '1'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           that.setData({
-            banners: res.data.data
+            banners: res.data.obj
           });
         }
       }
