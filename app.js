@@ -2,6 +2,7 @@ App({
   onLaunch: function () {
     var that = this;
     that.urls();
+  
     wx.getSystemInfo({
       success: function (res) {
         if (res.model.search("iPhone X") != -1) {
@@ -86,11 +87,14 @@ App({
             js_code:res.code
           },
           success: function (res) {
-            if (res.data.code == 1e4) {
+            if (res.data.state == 1) {
               that.globalData.usinfo = 0;
+              that.globalData.openId = JSON.parse(res.data.JsonStr).openid;
+
+              that.getAuthuriseInfo();
               return;
             }
-            if (res.data.code != 0) {
+            if (res.data.state == 0) {
               wx.hideLoading();
               wx.showModal({
                 title: "提示",
@@ -99,13 +103,63 @@ App({
               });
               return;
             }
-            that.globalData.token = res.data.data.token;
-            that.globalData.uid = res.data.data.uid;
           }
         });
       }
     });
   },
+  getAuthuriseInfo: function(){
+    var that = this;
+    wx.getSetting({
+      success: function (res) {
+        if (res.authSetting['scope.userInfo']) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+          wx.getUserInfo({
+            success: function (res) {
+              //调用我们的getUserInfo接口
+              that.saveUserInfo(res.userInfo);
+            }
+          })
+
+          that.globalData.hasAuthorized = true;
+        } else {
+          //未授权
+          // wx.authorize({
+          //   scope: '',
+          // })
+
+          that.globalData.hasAuthorized = false;
+        }
+      }
+    })
+  },
+
+  saveUserInfo: function(userInfo){
+    var that = this;
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx.asmx/MyUserInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        OpenId: that.globalData.openId,
+        UserName: userInfo.nickName,
+        HeadImgUrl: userInfo.avatarUrl
+      },
+      success: function (res) {
+        if (res.data.state == 1) {
+          var Id = res.data.obj.Id;
+          userInfo.Id = Id;
+          userInfo.CartNumber = res.data.obj.CartNumber;
+          userInfo.Score = res.data.obj.Score;
+          userInfo.SignDay = res.data.obj.SignDay;
+          that.globalData.userInfo = userInfo;
+        }
+      }
+    })
+  },
+
   urls: function () {
     var that = this;
     that.globalData.urls = that.siteInfo.url + that.siteInfo.subDomain;

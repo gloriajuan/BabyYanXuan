@@ -93,6 +93,37 @@ Page({
     var that = this;
     var iv = e.detail.iv;
     var encryptedData = e.detail.encryptedData;
+    var userInfo = e.detail.userInfo;
+
+    var openId = app.globalData.openId;
+
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx/MyUserInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        OpenId: openId,
+        UserName: userInfo.nickName,
+        HeadImgUrl:userInfo.avatarUrl
+      },
+      success: function (res) {
+        if (res.data.state == 1) {
+          var Id = res.data.obj.Id;
+          userInfo.Id = Id;
+          userInfo.CartNumber = res.data.obj.CartNumber;
+          userInfo.Score = res.data.obj.Score;
+          userInfo.SignDay = res.data.obj.SignDay;
+          app.globalData.userInfo = userInfo;
+          that.setData({
+              userInfo:userInfo
+          });
+        }
+      }
+    })
+
+    /*
     wx.login({
       success: function (wxs) {
         wx.request({
@@ -124,11 +155,12 @@ Page({
         })
       }
     })
+    */
   },
   onShow: function () {
     var that = this;
     setTimeout(function () {
-      if (app.globalData.usinfo == 0) {
+      if (!app.globalData.hasAuthorized) {
         that.setData({
           wxlogin: false
         })
@@ -138,6 +170,11 @@ Page({
   },
   onLoad: function () {
     var that = this;
+
+    that.setData({
+      wxLogin: app.globalData.hasAuthorized
+    });
+
     if (app.globalData.iphone==true){
       that.setData({iphone:true})
     }
@@ -168,9 +205,9 @@ Page({
       },
       success: function (res) {
         if (res.data.state == 1) {
-          that.setData({
-            banners: res.data.obj
-          });
+            that.setData({
+              banners: res.data.obj
+            });
         }
       }
     })

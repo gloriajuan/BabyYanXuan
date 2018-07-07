@@ -24,6 +24,7 @@
     </view>
   </view>
   <view class="home-hover"></view>
+  <!--优惠-->
   <view wx:if="{{toptuan}}" class="pingtuna-container">
     <view class="pingtuna-title" bindtap="tapSales" data-id="{{toptuaninfo.remark}}">
       <text>{{toptuaninfo.value}}</text>
@@ -36,6 +37,7 @@
       <image src="{{item.picUrl}}" />
     </view>
   </view>
+  <!--砍价
   <view wx:if="{{topkan}}" class="kanjia-container" wx:for="{{topkan}}" wx:key="id">
     <view class="kanjia-title" bindtap="tapSales" data-id="{{item.linkUrl}}">
       <text>{{item.title}}</text>
@@ -65,6 +67,8 @@
       </view>
     </view>
   </view>
+  -->
+  <!--精选专题-->
   <view wx:if="{{toptopic}}" class="topic-container" wx:for="{{toptopic}}" wx:key="id">
     <view class="topic-title" bindtap="tapSales" data-id="{{item.linkUrl}}">
       <text>{{item.title}}</text>
@@ -81,6 +85,7 @@
       </view>
     </scroll-view>
   </view>
+  <!--人气推荐-->
   <view wx:if="{{topgoods}}" class="goods-container">
     <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.remark}}">
       <text>{{topgoods.value}}</text>
