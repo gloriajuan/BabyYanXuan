@@ -75,9 +75,15 @@ App({
     wx.login({
       success: function (res) {
         wx.request({
-          url: that.globalData.urls + "/user/wxapp/login",
+          url: that.globalData.urls + "/MyBill.asmx/GetWxOpenId",
+          method: "POST",
+          header: {
+            "content-type": "application/x-www-form-urlencoded"
+          },
           data: {
-            code: res.code
+            appid:'wxa4138ba5e260a760',
+            secret:'82da0d7ca8fb21234319d3de058743a7',
+            js_code:res.code
           },
           success: function (res) {
             if (res.data.code == 1e4) {
