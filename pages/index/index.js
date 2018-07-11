@@ -122,40 +122,6 @@ Page({
         }
       }
     })
-
-    /*
-    wx.login({
-      success: function (wxs) {
-        wx.request({
-          url: app.globalData.urls + '/user/wxapp/register/complex',
-          data: {
-            code: wxs.code,
-            encryptedData: encryptedData,
-            iv: iv
-          },
-          success: function (res) {
-            if (res.data.code != 0) {
-              wx.showModal({
-                title: '温馨提示',
-                content: '需要您的授权，才能正常使用哦～',
-                showCancel: false,
-                success: function (res) { }
-              })
-            } else {
-              that.setData({ wxlogin: true })
-              app.login();
-              wx.showToast({
-                title: '授权成功',
-                duration: 2000
-              })
-              app.globalData.usinfo = 1;
-              wx.showTabBar();
-            }
-          }
-        })
-      }
-    })
-    */
   },
   onShow: function () {
     var that = this;
@@ -211,126 +177,56 @@ Page({
         }
       }
     })
-    //4个功能展示位
+    //获取特惠商品信息
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/MyBill.asmx/GetMyBill',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        key: 'mallName',
-        type: 'sale'
+        TypeId: '1'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           that.setData({
-            sales: res.data.data
+            toptuan: res.data.obj
           });
-        }
-      }
-    })
-    //获取拼团商品信息
-    wx.request({
-      url: app.globalData.urls + '/banner/list',
-      data: {
-        type: 'toptuan'
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          wx.request({
-            url: app.globalData.urls + '/config/get-value',
-            data: {
-              key: 'toptuan',
-            },
-            success: function (res) {
-              if (res.data.code == 0) {
-                that.setData({
-                  toptuaninfo: res.data.data
-                });
-              }
-            }
-          })
-          that.setData({
-            toptuan: res.data.data
-          });
-        }
-      }
-    })
-    //获取砍价商品信息
-    wx.request({
-      url: app.globalData.urls + '/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'topkan'
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          var kb = res.data.data[0].remark;
-          var kbarr = kb.split(',');
-          that.setData({
-            topkan: res.data.data
-          });
-          var topkans = [];
-          for (var i = 0; i < kbarr.length; i++) {
-            wx.request({
-              url: app.globalData.urls + '/shop/goods/detail',
-              data: {
-                id: kbarr[i]
-              },
-              success: function (res) {
-                if (res.data.code == 0) {
-                  topkans.push(res.data.data.basicInfo);
-                }
-                that.setData({
-                  topkans: topkans
-                });
-              }
-            })
-          }
         }
       }
     })
     //获取精选专题信息
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/MyBill.asmx/GetMyBill',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        key: 'mallName',
-        type: 'toptopic'
+        TypeId: '1'
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          var kb = res.data.data[0].remark;
-          var kbarr = kb.split(',');
+        if (res.data.state == 1) {
           that.setData({
-            toptopic: res.data.data
+            toptopics: res.data.obj
           });
-          var toptopics = [];
-          for (var i = 0; i < kbarr.length; i++) {
-            wx.request({
-              url: app.globalData.urls + '/cms/news/detail',
-              data: {
-                id: kbarr[i]
-              },
-              success: function (res) {
-                if (res.data.code == 0) {
-                  toptopics.push(res.data.data);
-                }
-                that.setData({
-                  toptopics: toptopics
-                });
-              }
-            })
-          }
         }
       }
     })
     //获取推荐商品信息
     wx.request({
-      url: app.globalData.urls + '/config/get-value',
+      url: app.globalData.urls + '/MyBill.asmx/GetMyBill',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        key: 'topgoods'
+        TypeId: '1'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           that.setData({
-            topgoods: res.data.data
+            topgoods: res.data.obj
           });
           wx.request({
             url: app.globalData.urls + '/shop/goods/list',

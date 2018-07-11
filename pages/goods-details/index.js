@@ -41,6 +41,11 @@ Page({
   },
   onLoad: function (e) {
     var that = this;
+
+    that.setData({
+      wxLogin: app.globalData.hasAuthorized
+    });
+    
     if (e.inviter_id) {
       wx.setStorage({
         key: 'inviter_id_' + e.id,
@@ -75,80 +80,25 @@ Page({
       }
     })
     wx.request({
-      url: app.globalData.urls + '/shop/goods/detail',
+      url: app.globalData.urls + '/MyGoods.asmx/GetMyGoods',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        id: e.id
+        // GoodId: e.id,
+        GoodId:'17'
       },
       success: function (res) {
 
-        var selectSizeTemp = "";
-        if (res.data.data.properties) {
-          for (var i = 0; i < res.data.data.properties.length; i++) {
-            selectSizeTemp = selectSizeTemp + " " + res.data.data.properties[i].name;
-          }
-          that.setData({
-            hasMoreSelect: true,
-            selectSize: that.data.selectSize + selectSizeTemp,
-            selectSizePrice: res.data.data.basicInfo.minPrice,
-            selectptPrice: res.data.data.basicInfo.pingtuanPrice
-          });
+        if(res.data.state == 1){
+          that.data.goodsDetail = res.data.obj;
         }
-        that.data.goodsDetail = res.data.data;
-        if (res.data.data.basicInfo.videoId) {
-          that.getVideoSrc(res.data.data.basicInfo.videoId);
-        }
-        that.setData({
-          goodsDetail: res.data.data,
-          selectSizePrice: res.data.data.basicInfo.minPrice,
-          buyNumMax: res.data.data.basicInfo.stores,
-          buyNumber: (res.data.data.basicInfo.stores > 0) ? 1 : 0,
-          selectptPrice: res.data.data.basicInfo.pingtuanPrice
-        });
+        
         WxParse.wxParse('article', 'html', res.data.data.content, that, 5);
-        that.goPingtuan();
-        that.goPingList();
       }
     })
     this.reputation(e.id);
-  },
-  goPingtuan: function () {
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/set',
-      data: {
-        goodsId: that.data.goodsDetail.basicInfo.id,
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.setData({
-            pingtuan: res.data.data
-          });
-        }
-      }
-    })
-  },
-  goPingList: function () {
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/list',
-      data: {
-        goodsId: that.data.goodsDetail.basicInfo.id,
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.setData({
-            pingList: res.data.data
-          });
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].uid == app.globalData.uid) {
-              that.setData({
-                ptuanCt: res.data.data[i].id
-              });
-            }
-          }
-        }
-      }
-    })
   },
   goShopCar: function () {
     wx.reLaunch({
@@ -684,7 +634,7 @@ Page({
   onShow: function () {
     var that = this;
     setTimeout(function () {
-      if (app.globalData.usinfo == 0) {
+      if (!app.globalData.hasAuthorized) {
         that.setData({
           wxlogin: false
         })

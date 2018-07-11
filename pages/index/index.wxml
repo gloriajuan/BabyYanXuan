@@ -17,85 +17,54 @@
       </block>
     </view>
   </view>
-  <view class="menu-container">
+  <view class="menu-container" hidden="true">
     <view class="menu-list" wx:for="{{sales}}" wx:key="id" bindtap="tapSales" data-id="{{item.linkUrl}}">
       <image src="{{item.picUrl}}" />
       <text>{{item.title}}</text>
     </view>
   </view>
-  <view class="home-hover"></view>
-  <!--优惠-->
+  <view class="home-hover" hidden='true'></view>
+  <!--特惠-->
   <view wx:if="{{toptuan}}" class="pingtuna-container">
     <view class="pingtuna-title" bindtap="tapSales" data-id="{{toptuaninfo.remark}}">
-      <text>{{toptuaninfo.value}}</text>
+      <text>特惠</text>
       <image src="../../images/home_more.png" />
     </view>
-    <view class="pingtuna-list" wx:for="{{toptuan}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.businessId}}">
-      <view class="pingtuna-list-title">{{item.title}}</view>
-      <view wx:if="{{item.linkUrl}}" class="pingtuna-list-text">{{item.linkUrl}}</view>
-      <view wx:if="{{item.remark}}" class="pingtuna-list-info">{{item.remark}}</view>
-      <image src="{{item.picUrl}}" />
+    <view class="pingtuna-list" wx:for="{{toptuan}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.GoodsId}}">
+      <view class="pingtuna-list-title">{{item.Title}}</view>
+      <view wx:if="{{item.Info}}" class="pingtuna-list-text">{{item.Info}}</view>
+      <view wx:if="热卖" class="pingtuna-list-info">热卖</view>
+      <image src="{{item.ImgUrl}}" />
     </view>
   </view>
-  <!--砍价
-  <view wx:if="{{topkan}}" class="kanjia-container" wx:for="{{topkan}}" wx:key="id">
-    <view class="kanjia-title" bindtap="tapSales" data-id="{{item.linkUrl}}">
-      <text>{{item.title}}</text>
-      <image src="../../images/home_more.png" />
-    </view>
-    <view class="kanjia-list" wx:for-items="{{topkans}}" wx:key="{{index}}" bindtap="kanjiaTap" data-id="{{item.id}}">
-      <view class="kanjia-list-image">
-        <image src="{{item.pic}}" />
-      </view>
-      <view class="kanjia-list-info">
-        <view class="kanjia-list-info-title">{{item.name}}</view>
-        <view class="kanjia-list-info-info">{{item.characteristic}}</view>
-        <view class="kanjia-list-info-money">
-          <view class="kanjia-list-info-money-a">
-            <text class="a">Ұ{{item.minPrice}}</text>
-            <text class="b">底价</text>
-          </view>
-          <view class="kanjia-list-info-money-a">
-            <text>Ұ{{item.originalPrice}}</text>
-            <text>原价</text>
-          </view>
-          <view class="kanjia-list-info-money-a">
-            <text>{{item.stores}}件</text>
-            <text>限量</text>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-  -->
   <!--精选专题-->
-  <view wx:if="{{toptopic}}" class="topic-container" wx:for="{{toptopic}}" wx:key="id">
-    <view class="topic-title" bindtap="tapSales" data-id="{{item.linkUrl}}">
-      <text>{{item.title}}</text>
+  <view wx:if="{{toptopics}}" class="topic-container" wx:key="id">
+    <view class="topic-title" bindtap="tapSales" data-id="{{item.GoodsId}}">
+      <text>专题</text>
       <image src="../../images/home_more.png" />
     </view>
     <scroll-view class="topic-list-box" scroll-x="true">
-      <view class="topic-list" wx:for-items="{{toptopics}}" wx:key="{{index}}" bindtap="toTopic" data-id="{{item.id}}">
-        <image src="{{item.pic}}" />
+      <view class="topic-list" wx:for-items="{{toptopics}}" wx:key="{{index}}" bindtap="toTopic" data-id="{{item.GoodsId}}">
+        <image src="{{item.ImgUrl}}" />
         <view class="topic-list-info">
-          <view class="topic-list-info-title">{{item.title}}</view>
-          <view class="topic-list-info-text">{{item.descript}}</view>
-          <view wx:if="{{item.income}}" class="topic-list-info-money">{{item.income}}</view>
+          <view class="topic-list-info-title">{{item.Title}}</view>
+          <view class="topic-list-info-text">{{item.Info}}</view>
+          <view wx:if="{{item.Price}}" class="topic-list-info-money">{{item.Price}}</view>
         </view>
       </view>
     </scroll-view>
   </view>
   <!--人气推荐-->
   <view wx:if="{{topgoods}}" class="goods-container">
-    <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.remark}}">
-      <text>{{topgoods.value}}</text>
+    <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.GoodsId}}">
+      <text>人气推荐</text>
       <image src="../../images/home_more.png" />
     </view>
-    <view class="goods-list" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
-      <image mode="widthFix" src="{{item.pic}}" />
-      <view class="goods-list-title">{{item.name}}</view>
-      <view class="goods-list-text">{{item.characteristic}}</view>
-      <view class="goods-list-money">Ұ{{item.minPrice}}</view>
+    <view class="goods-list" wx:for-items="{{topgoods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.GoodsId}}">
+      <image mode="widthFix" src="{{item.ImgUrl}}" />
+      <view class="goods-list-title">{{item.Title}}</view>
+      <view class="goods-list-text">{{item.Info}}</view>
+      <view class="goods-list-money">Ұ{{item.Price}}</view>
     </view>
   </view>
 </view>
