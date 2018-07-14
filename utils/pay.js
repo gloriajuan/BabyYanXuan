@@ -7,24 +7,22 @@ function wxpay(app, money, orderId, redirectUrl) {
     nextAction = { type: 0, id: orderId };
   }
   wx.request({
-    url: app.globalData.urls + '/pay/wxapp/get-pay-data',
-    data: {
-      token:app.globalData.token,
-      money:money,
-      remark: remark,
-      payName:"在线支付",
-      nextAction: nextAction
+    url: app.globalData.urls + '/MyWxPay.asmx/GetWxPayUnifiedorder',
+    method: 'POST',
+    header: {
+      "content-type": "application/x-www-form-urlencoded"
     },
-    //method:'POST',
+    data: {
+    },
     success: function(res){
-      if(res.data.code == 0){
+      if (res.data.state == 1){
         // 发起支付
         wx.requestPayment({
-          timeStamp:res.data.data.timeStamp,
-          nonceStr:res.data.data.nonceStr,
-          package:'prepay_id=' + res.data.data.prepayId,
-          signType:'MD5',
-          paySign:res.data.data.sign,
+          timeStamp: res.data.timeStamp,
+          nonceStr: res.data.nonceStr,
+          package: res.data.package,
+          signType: "MD5",
+          paySign: res.data.paySign,
           fail:function (aaa) {
             wx.showToast({title: '支付失败'})
           },
@@ -36,7 +34,7 @@ function wxpay(app, money, orderId, redirectUrl) {
           }
         })
       } else {
-        wx.showToast({ title: '服务器忙' + res.data.code + res.data.msg})
+        wx.showToast({ title: '服务器忙' + res.data.state + res.data.message})
       }
     }
   })

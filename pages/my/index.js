@@ -1,5 +1,5 @@
 const app = getApp()
-
+var wxpay = require('../../utils/pay.js')
 Page({
 	data: {
     balance:0,
@@ -209,5 +209,7 @@ Page({
       url: "/pages/fav-list/index"
     })
   },
-  
+  gopay:function(){
+    wxpay.wxpay(app, 1, 11, "/pages/index/index");
+  }
 })

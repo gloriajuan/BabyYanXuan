@@ -43,17 +43,21 @@ Page({
   initShippingAddress: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls +'/user/shipping-address/list',
+      url: app.globalData.urls + '/MyGoods.asmx/GetMyAddress',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        token:app.globalData.token
+        UserId: app.globalData.userInfo.Id
       },
       success: (res) =>{
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           that.setData({
-            addressList:res.data.data,
+            addressList:res.data.obj,
             loadingMoreHidden: true
           });
-        } else if (res.data.code == 700){
+        } else{
           that.setData({
             addressList: null,
             loadingMoreHidden: false

@@ -137,7 +137,7 @@ App({
   saveUserInfo: function(userInfo){
     var that = this;
     wx.request({
-      url: that.globalData.urls + '/MyGoods.asmx.asmx/MyUserInfo',
+      url: that.globalData.urls + '/MyGoods.asmx/MyUserInfo',
       method: "POST",
       header: {
         "content-type": "application/x-www-form-urlencoded"

@@ -9,15 +9,15 @@ Page({
       noSelect: false,
       list: []
     },
-    delBtnWidth: 120,    //删除按钮宽度单位（rpx）
+    delBtnWidth: 120, //删除按钮宽度单位（rpx）
   },
 
   //获取元素自适应后的实际宽度
-  getEleWidth: function (w) {
+  getEleWidth: function(w) {
     var real = 0;
     try {
       var res = wx.getSystemInfoSync().windowWidth;
-      var scale = (750 / 2) / (w / 2);  //以宽度750px设计稿做宽度的自适应
+      var scale = (750 / 2) / (w / 2); //以宽度750px设计稿做宽度的自适应
       // console.log(scale);
       real = Math.floor(res / scale);
       return real;
@@ -26,80 +26,45 @@ Page({
       // Do something when catch error
     }
   },
-  initEleWidth: function () {
+  initEleWidth: function() {
     var delBtnWidth = this.getEleWidth(this.data.delBtnWidth);
     this.setData({
       delBtnWidth: delBtnWidth
     });
   },
-  toDetailsTap: function (e) {
+  toDetailsTap: function(e) {
     wx.navigateTo({
       url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
     })
   },
-  onLoad: function () {
+  onLoad: function() {
     var that = this;
-    if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
-    wx.request({
-      url: app.globalData.urls + '/config/get-value',
-      data: {
-        key: 'shopcart'
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          var kb = res.data.data.value;
-          var kbarr = kb.split(',');
-          that.setData({
-            sales: res.data.data
-          });
-          var sales = [];
-          for (var i = 0; i < kbarr.length; i++) {
-            wx.request({
-              url: app.globalData.urls + '/shop/goods/detail',
-              data: {
-                id: kbarr[i]
-              },
-              success: function (res) {
-                if (res.data.code == 0) {
-                  sales.push(res.data.data.basicInfo);
-                }
-                that.setData({
-                  sales: sales
-                });
-              }
-            })
-          }
-        }
-      }
-    })
-
+    if (app.globalData.iphone == true) {
+      that.setData({
+        iphone: 'iphone'
+      })
+    }
     that.initEleWidth();
     that.onShow();
   },
-  onShow: function () {
-    var shopList = [];
+  onShow: function() {
     // 获取购物车数据
-    var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
-    if (shopCarInfoMem && shopCarInfoMem.shopList) {
-      shopList = shopCarInfoMem.shopList
-    }
-    this.data.goodsList.list = shopList;
-    this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), shopList);
+    this.getCartList();
   },
-  toIndexPage: function () {
+  toIndexPage: function() {
     wx.switchTab({
       url: "/pages/index/index"
     });
   },
 
-  touchS: function (e) {
+  touchS: function(e) {
     if (e.touches.length == 1) {
       this.setData({
         startX: e.touches[0].clientX
       });
     }
   },
-  touchM: function (e) {
+  touchM: function(e) {
     var index = e.currentTarget.dataset.index;
 
     if (e.touches.length == 1) {
@@ -107,9 +72,9 @@ Page({
       var disX = this.data.startX - moveX;
       var delBtnWidth = this.data.delBtnWidth;
       var left = "";
-      if (disX == 0 || disX < 0) {//如果移动距离小于等于0，container位置不变
+      if (disX == 0 || disX < 0) { //如果移动距离小于等于0，container位置不变
         left = "margin-left:0px";
-      } else if (disX > 0) {//移动距离大于0，container left值等于手指移动距离
+      } else if (disX > 0) { //移动距离大于0，container left值等于手指移动距离
         left = "margin-left:-" + disX + "px";
         if (disX >= delBtnWidth) {
           left = "left:-" + delBtnWidth + "px";
@@ -123,7 +88,7 @@ Page({
     }
   },
 
-  touchE: function (e) {
+  touchE: function(e) {
     var index = e.currentTarget.dataset.index;
     if (e.changedTouches.length == 1) {
       var endX = e.changedTouches[0].clientX;
@@ -139,13 +104,13 @@ Page({
       }
     }
   },
-  delItem: function (e) {
+  delItem: function(e) {
     var index = e.currentTarget.dataset.index;
     var list = this.data.goodsList.list;
     list.splice(index, 1);
     this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), list);
   },
-  selectTap: function (e) {
+  selectTap: function(e) {
     var index = e.currentTarget.dataset.index;
     var list = this.data.goodsList.list;
     if (index !== "" && index != null) {
@@ -153,7 +118,7 @@ Page({
       this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), list);
     }
   },
-  totalPrice: function () {
+  totalPrice: function() {
     var list = this.data.goodsList.list;
     var total = 0;
     for (var i = 0; i < list.length; i++) {
@@ -162,10 +127,10 @@ Page({
         total += parseFloat(curItem.price) * curItem.number;
       }
     }
-    total = parseFloat(total.toFixed(2));//js浮点计算bug，取两位小数精度
+    total = parseFloat(total.toFixed(2)); //js浮点计算bug，取两位小数精度
     return total;
   },
-  allSelect: function () {
+  allSelect: function() {
     var list = this.data.goodsList.list;
     var allSelect = false;
     for (var i = 0; i < list.length; i++) {
@@ -179,7 +144,7 @@ Page({
     }
     return allSelect;
   },
-  noSelect: function () {
+  noSelect: function() {
     var list = this.data.goodsList.list;
     var noSelect = 0;
     for (var i = 0; i < list.length; i++) {
@@ -194,7 +159,7 @@ Page({
       return false;
     }
   },
-  setGoodsList: function (saveHidden, total, allSelect, noSelect, list) {
+  setGoodsList: function(saveHidden, total, allSelect, noSelect, list) {
     this.setData({
       goodsList: {
         saveHidden: saveHidden,
@@ -211,12 +176,8 @@ Page({
       tempNumber = tempNumber + list[i].number
     }
     shopCarInfo.shopNum = tempNumber;
-    wx.setStorage({
-      key: "shopCarInfo",
-      data: shopCarInfo
-    })
   },
-  bindAllSelect: function () {
+  bindAllSelect: function() {
     var currentAllSelect = this.data.goodsList.allSelect;
     var list = this.data.goodsList.list;
     if (currentAllSelect) {
@@ -233,7 +194,7 @@ Page({
 
     this.setGoodsList(this.getSaveHide(), this.totalPrice(), !currentAllSelect, this.noSelect(), list);
   },
-  jiaBtnTap: function (e) {
+  jiaBtnTap: function(e) {
     var index = e.currentTarget.dataset.index;
     var list = this.data.goodsList.list;
     if (index !== "" && index != null) {
@@ -243,7 +204,7 @@ Page({
       }
     }
   },
-  jianBtnTap: function (e) {
+  jianBtnTap: function(e) {
     var index = e.currentTarget.dataset.index;
     var list = this.data.goodsList.list;
     if (index !== "" && index != null) {
@@ -253,7 +214,7 @@ Page({
       }
     }
   },
-  editTap: function () {
+  editTap: function() {
     var list = this.data.goodsList.list;
     for (var i = 0; i < list.length; i++) {
       var curItem = list[i];
@@ -261,7 +222,7 @@ Page({
     }
     this.setGoodsList(!this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), list);
   },
-  saveTap: function () {
+  saveTap: function() {
     var list = this.data.goodsList.list;
     for (var i = 0; i < list.length; i++) {
       var curItem = list[i];
@@ -269,11 +230,11 @@ Page({
     }
     this.setGoodsList(!this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), list);
   },
-  getSaveHide: function () {
+  getSaveHide: function() {
     var saveHidden = this.data.goodsList.saveHidden;
     return saveHidden;
   },
-  deleteSelected: function () {
+  deleteSelected: function() {
     var list = this.data.goodsList.list;
     /*
      for(let i = 0 ; i < list.length ; i++){
@@ -284,12 +245,12 @@ Page({
      }
      */
     // above codes that remove elements in a for statement may change the length of list dynamically
-    list = list.filter(function (curGoods) {
+    list = list.filter(function(curGoods) {
       return !curGoods.active;
     });
     this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), list);
   },
-  toPayOrder: function () {
+  toPayOrder: function() {
     wx.showLoading();
     var that = this;
     if (this.data.goodsList.noSelect) {
@@ -325,7 +286,7 @@ Page({
           data: {
             id: carShopBean.goodsId
           },
-          success: function (res) {
+          success: function(res) {
             doneNumber++;
             if (res.data.data.properties) {
               wx.showModal({
@@ -369,7 +330,7 @@ Page({
             goodsId: carShopBean.goodsId,
             propertyChildIds: carShopBean.propertyChildIds
           },
-          success: function (res) {
+          success: function(res) {
             doneNumber++;
             if (res.data.data.stores < carShopBean.number) {
               wx.showModal({
@@ -400,13 +361,32 @@ Page({
 
     }
   },
-  navigateToPayOrder: function () {
+  navigateToPayOrder: function() {
     wx.hideLoading();
     wx.navigateTo({
       url: "/pages/to-pay-order/index"
     })
+  },
+  // 获取购物车数据
+  getCartList: function () {
+    var that = this;
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx/GetMyCart',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        UserId: app.globalData.userInfo.Id
+      },
+      success: function (res) {
+        if (res.data.state == 1) {
+          var shopList = [];
+          var shopList = res.data.obj;
+          that.data.goodsList.list = shopList;
+          that.setGoodsList(that.getSaveHide(), that.totalPrice(), that.allSelect(), that.noSelect(), shopList);
+        }
+      }
+    })
   }
-
-
-
 })
