@@ -86,16 +86,16 @@ Page({
         "content-type": "application/x-www-form-urlencoded"
       },
       data: {
-        // GoodId: e.id,
-        GoodId:'17'
+        GoodId: e.id
       },
       success: function (res) {
 
         if(res.data.state == 1){
           that.data.goodsDetail = res.data.obj;
+          that.data.goodsDetail.ImgUrl = ["http://myadm.holdcity.com/GoodsImg/20180624/201806242155255964.jpg", "http://myadm.holdcity.com/GoodsImg/20180624/201806242155255964.jpg", "http://myadm.holdcity.com/GoodsImg/20180624/201806242155255964.jpg"];
         }
         
-        WxParse.wxParse('article', 'html', res.data.data.content, that, 5);
+        WxParse.wxParse('article', 'html', res.data.obj.Title, that, 5);
       }
     })
     this.reputation(e.id);

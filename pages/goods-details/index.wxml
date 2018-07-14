@@ -8,7 +8,7 @@
       <image class="goback" src="../../images/goback.png" />
     </navigator>
   </view>
-  <view class="swiper-container" wx:if="true">
+  <view class="swiper-container">
     <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
       <block wx:for="{{goodsDetail.ImgUrl}}" wx:key="id">
         <swiper-item>
@@ -27,8 +27,8 @@
   </view>
   <view class="goods-info">
     <view class="goods-left">
-      <view class="goods-title">{{goodsDetail.basicInfo.name}}</view>
-      <view class="goods-characteristic">{{goodsDetail.basicInfo.characteristic}}</view>
+      <view class="goods-title">{{goodsDetail.Title}}</view>
+      <view class="goods-characteristic">{{goodsDetail.Info}}</view>
       <block wx:if="{{goodsDetail.basicInfo.pingtuan == true}}">
         <view class="goods-ptuan-box">
           <view class="goods-ptuan">
@@ -44,7 +44,7 @@
       </block>
       <block wx:if="{{goodsDetail.basicInfo.pingtuan == false}}">
         <view class="goods-price">Ұ {{selectSizePrice}}</view>
-        <view class="goods-originalPrice">Ұ {{goodsDetail.basicInfo.originalPrice}}</view>
+        <view class="goods-originalPrice">Ұ {{goodsDetail.OriginalPrice}}</view>
         <view class="piangjia">
           已售 {{goodsDetail.basicInfo.numberOrders}}
         </view>
@@ -126,34 +126,7 @@
       <button open-type="share"></button>
     </image>
   </view>
-  <block wx:if="{{goodsDetail.basicInfo.pingtuan == true}}">
-    <view class="footer-box">
-      <view class="box-list">
-        <image src="../../images/goods_service.png"></image>
-        <button open-type="contact" session-from="weapp"></button>
-      </view>
-      <view class="box-list" bindtap="{{favicon == 0 ? 'fav':'del'}}">
-        <image wx:if="{{favicon == 0}}" src="../../images/goods_collect.png"></image>
-        <image wx:if="{{favicon == 1}}" src="../../images/goods_collect_checked.png"></image>
-      </view>
-      <block wx:if="{{ptuanCt}}">
-        <view class="box-title buy-now shares" bindtap="goPingtuanTap">
-          我已发起过拼团 | 查看拼团详情
-        </view>
-      </block>
-      <block wx:if="{{!ptuanCt}}">
-        <view class="box-title ono" bindtap="tobuy">
-          <view class="boxshop-yuan">Ұ {{selectSizePrice}}</view>
-          <view class="box-shop-cart">原价购买</view>
-        </view>
-        <view class="box-title buy-now twt" bindtap="pingtuan">
-          <view class="boxshop-yuan">Ұ {{goodsDetail.basicInfo.pingtuanPrice}}</view>
-          <view class="box-shop-cart">一键开团</view>
-        </view>
-      </block>
-    </view>
-  </block>
-  <block wx:if="{{goodsDetail.basicInfo.pingtuan == false}}">
+  <block wx:if="true">
     <view class="footer-box">
       <view class="box-list">
         <image src="../../images/goods_service.png"></image>
