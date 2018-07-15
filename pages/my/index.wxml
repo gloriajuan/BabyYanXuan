@@ -62,10 +62,6 @@
       <navigator hover-class="none">联系客服</navigator>
       <button open-type="contact" session-from="weapp"></button>
     </view>
-     <view class="userinfo-item" bindtap="gopay">
-      <image src="../../images/profile_service.png"></image>
-      <text hover-class="none">联系客服</text>
-    </view>
   </view>
   <view class="userinfo-info">
     {{getInfo}}

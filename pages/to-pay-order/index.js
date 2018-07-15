@@ -67,7 +67,7 @@ Page({
   },
 
   createOrder: function (e) {
-    if (!thisthat.data.curAddressData) {
+    if (!this.data.curAddressData) {
       wx.hideLoading();
       wx.showModal({
         title: '错误',
@@ -110,6 +110,9 @@ Page({
       success: (res) => {
         if (res.data.state == 1) {
           console.log("下单返回====" + JSON.stringify(res.data));
+          wx.redirectTo({
+            url: "/pages/order-list/index"
+          });
         }
       }
     })

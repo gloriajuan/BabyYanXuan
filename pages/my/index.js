@@ -209,7 +209,4 @@ Page({
       url: "/pages/fav-list/index"
     })
   },
-  gopay:function(){
-    wxpay.wxpay(app, 1, 11, "/pages/index/index");
-  }
 })
