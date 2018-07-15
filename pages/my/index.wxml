@@ -11,25 +11,25 @@
 	</view>
   <view class="userinfo-item">
     <image src="../../images/profile_dfunding.png"></image>
-    <navigator url="/pages/order-list/index" hover-class="none">我的订单</navigator>
+    <navigator url="/pages/order-list/index?currentType=1" hover-class="none">我的订单</navigator>
   </view>
   <view class="user-cart-list">
-    <view class="cart-list" bindtap="goorderlist" data-index="0">
+    <view class="cart-list" bindtap="goorderlist" data-index="1">
       <view class="{{tabClass[0]}}"></view>
       <image src="../../images/order-details/orderform_pay.png"></image>
       待付款
     </view>
-    <view class="cart-list" bindtap="goorderlist" data-index="1">
+    <view class="cart-list" bindtap="goorderlist" data-index="2">
       <view class="{{tabClass[1]}}"></view>
       <image src="../../images/order-details/orderform_ship.png"></image>
       待发货
     </view>
-    <view class="cart-list" bindtap="goorderlist" data-index="2">
+    <view class="cart-list" bindtap="goorderlist" data-index="3">
       <view class="{{tabClass[2]}}"></view>
       <image src="../../images/order-details/delivering.png"></image>
       待收货
     </view>
-    <view class="cart-list" bindtap="goorderlist" data-index="3">
+    <view class="cart-list" bindtap="goorderlist" data-index="4">
       <view class="{{tabClass[3]}}"></view>
       <image src="../../images/order-details/orderform.png"></image>
       待评价

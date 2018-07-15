@@ -21,42 +21,26 @@ Page({
     //console.log(this.data.orderType)
     var that = this;
     var shopList = [];
-    //砍价下单
-    if ("buykj" == that.data.orderType) {
-      if (shopList.length == 0) {
-        var buykjInfoMem = wx.getStorageSync('buykjInfo');
-        if (buykjInfoMem && buykjInfoMem.shopList) {
-          shopList = buykjInfoMem.shopList
-        }
-      }
-    }
-    //拼团下单
-    else if ("buyPT" == that.data.orderType) {
-      if (shopList.length == 0) {
-        var buyPTInfoMem = wx.getStorageSync('PingTuanInfo');
-        if (buyPTInfoMem && buyPTInfoMem.shopList) {
-          shopList = buyPTInfoMem.shopList
-        }
-      }
-    }
-    //立即购买下单
-    else if ("buyNow" == that.data.orderType) {
+    if ("buyNow" == that.data.orderType) {
       var buyNowInfoMem = wx.getStorageSync('buyNowInfo');
       if (buyNowInfoMem && buyNowInfoMem.shopList) {
         shopList = buyNowInfoMem.shopList
       }
     } else {
       //购物车下单
-      var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
-      if (shopCarInfoMem && shopCarInfoMem.shopList) {
-        // shopList = shopCarInfoMem.shopList
-        shopList = shopCarInfoMem.shopList.filter(entity => {
-          return entity.active;
-        });
-      }
+      shopList = app.globalData.buyShopCartList;
     }
     that.setData({
       goodsList: shopList,
+    });
+    //计算商品金额
+    var price = 0;
+    for (var i = 0; i < that.data.goodsList.length; i++) {
+      var curItem = that.data.goodsList[i];
+      price += curItem.Number * curItem.Price;
+    }
+    that.setData({
+      allGoodsPrice: price
     });
     that.initShippingAddress();
   },
@@ -83,145 +67,84 @@ Page({
   },
 
   createOrder: function (e) {
-    wx.showLoading();
-    var that = this;
-    var loginToken = app.globalData.token // 用户登录 token
-    var remark = ""; // 备注信息
-    if (e) {
-      remark = e.detail.value.remark; // 备注信息
-    }
-    /* 备注信息必填
-    if (e && that.data.orderType == 'buykj' && remark == '') {
+    if (!thisthat.data.curAddressData) {
       wx.hideLoading();
       wx.showModal({
-        title: '提示',
-        content: '请添加备注信息！',
+        title: '错误',
+        content: '请先设置您的收货地址！',
         showCancel: false
       })
       return;
     }
-    */
-    var postData = {
-      token: loginToken,
-      goodsJsonStr: that.data.goodsJsonStr,
-      remark: remark
-    };
-    if (that.data.isNeedLogistics > 0) {
-      if (!that.data.curAddressData) {
-        wx.hideLoading();
-        wx.showModal({
-          title: '错误',
-          content: '请先设置您的收货地址！',
-          showCancel: false
-        })
-        return;
-      }
-      if ("buyPT" == that.data.orderType) {
-        postData.pingtuanOpenId = that.data.goodsList[0].pingtuanId;
-      } else if ("buykj" == that.data.orderType) {
-        postData.kjid = that.data.goodsList[0].kjid
-      }
-
-      postData.provinceId = that.data.curAddressData.provinceId;
-      postData.cityId = that.data.curAddressData.cityId;
-      if (that.data.curAddressData.districtId) {
-        postData.districtId = that.data.curAddressData.districtId;
-      }
-      postData.address = that.data.curAddressData.address;
-      postData.linkMan = that.data.curAddressData.linkMan;
-      postData.mobile = that.data.curAddressData.mobile;
-      postData.code = that.data.curAddressData.code;
+    var strJson="";
+    var orderParams = new Object();
+    var item=[];
+    wx.showLoading();
+    var that = this;
+    var remark = ""; // 备注信息
+    if (e) {
+      remark = e.detail.value.remark; // 备注信息
     }
-    if (that.data.curCoupon) {
-      postData.couponId = that.data.curCoupon.id;
+    orderParams.addressId = that.data.curAddressData.Id;
+    orderParams.expressFee = that.data.yunPrice;
+    orderParams.couponId = 0;
+    orderParams.message = remark;
+    for (var i = 0; i < that.data.goodsList.length; i++) {
+      var curItem = that.data.goodsList[i];
+      var shopgood = new Object();
+      shopgood.cartId = curItem.Id;
+        item.push(shopgood);
     }
-    if (!e) {
-      postData.calculate = "true";
-    }
-
+    orderParams.item = item;
+    strJson = JSON.stringify(orderParams);
+    console.log("订单====" + strJson);
     wx.request({
-      url: app.siteInfo.url + app.siteInfo.subDomain + '/order/create',
-      method: 'POST',
+      url: app.globalData.urls + '/MyGoods.asmx/SetOrderInfo',
+      method: "POST",
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        "content-type": "application/x-www-form-urlencoded"
       },
-      data: postData, // 设置请求的 参数
+      data: {
+        strJson: strJson
+      },
       success: (res) => {
-        wx.hideLoading();
-        if (res.data.code != 0) {
-          wx.showModal({
-            title: '错误',
-            content: res.data.msg,
-            showCancel: false
-          })
-          return;
+        if (res.data.state == 1) {
+          console.log("下单返回====" + JSON.stringify(res.data));
         }
-
-        if (e && "buyNow" != that.data.orderType) {
-          // 清空购物车数据
-          wx.removeStorageSync('shopCarInfo');
-          wx.removeStorageSync('buykjInfo');
-          wx.removeStorageSync('PingTuanInfo');
-        }
-        //console.log(that.data.goodsList[0].price)
-        if (!e) {
-          var allGoodsAndYunPrice = res.data.data.amountLogistics + res.data.data.amountTotle
-          if (that.data.orderType == 'buykj') {
-            allGoodsAndYunPrice = that.data.goodsList[0].price
-          }
-          if (that.data.orderType == 'buyPT') {
-            allGoodsAndYunPrice = that.data.goodsList[0].price * that.data.goodsList[0].number
-          }
-
-          that.setData({
-            isNeedLogistics: res.data.data.isNeedLogistics,
-            allGoodsPrice: res.data.data.amountTotle,
-            allGoodsAndYunPrice: allGoodsAndYunPrice,//res.data.data.amountLogistics + res.data.data.amountTotle,
-            yunPrice: res.data.data.amountLogistics
-          });
-          that.getMyCoupons();
-          return;
-        }
-        // 配置模板消息推送
-        var postJsonString = {};
-        postJsonString.keyword1 = { value: res.data.data.dateAdd, color: '#173177' }
-        postJsonString.keyword2 = { value: res.data.data.amountReal + '元', color: '#173177' }
-        postJsonString.keyword3 = { value: res.data.data.orderNumber, color: '#173177' }
-        postJsonString.keyword4 = { value: '订单已关闭', color: '#173177' }
-        postJsonString.keyword5 = { value: '您可以重新下单，请在30分钟内完成支付', color: '#173177' }
-        app.sendTempleMsg(res.data.data.id, -1,
-          app.siteInfo.closeorderkey, e.detail.formId,
-          'pages/index/index', JSON.stringify(postJsonString));
-        postJsonString = {};
-        postJsonString.keyword1 = { value: '您的订单已发货，请注意查收', color: '#173177' }
-        postJsonString.keyword2 = { value: res.data.data.orderNumber, color: '#173177' }
-        postJsonString.keyword3 = { value: res.data.data.dateAdd, color: '#173177' }
-        app.sendTempleMsg(res.data.data.id, 2,
-          app.siteInfo.deliveryorderkey, e.detail.formId,
-          'pages/order-details/index?id=' + res.data.data.id, JSON.stringify(postJsonString)) + '&share=1';
-        // 下单成功，跳转到订单管理界面
-        wx.redirectTo({
-          url: "/pages/order-list/index"
-        });
       }
     })
+    
   },
   initShippingAddress: function () {
     var that = this;
     wx.request({
-      url: app.siteInfo.url + app.siteInfo.subDomain + '/user/shipping-address/default',
+      url: app.globalData.urls + '/MyGoods.asmx/GetMyAddress',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        token: app.globalData.token
+        UserId: app.globalData.userInfo.Id
       },
       success: (res) => {
-        if (res.data.code == 0) {
-          that.setData({
-            curAddressData: res.data.data
-          });
-        } else {
-          that.setData({
-            curAddressData: null
-          });
+        if (res.data.state == 1) {
+          var indexAddress = -1;
+          for (var i = 0; i < res.data.obj.length; i++) {
+            var curItem = res.data.obj[i];
+            if (curItem.IsDefault == 1) {
+              indexAddress = i;
+              break;
+            }
+          }
+          if (indexAddress == -1) {
+            that.setData({
+              curAddressData: null
+            });
+          } else {
+            that.setData({
+              curAddressData: res.data.obj[indexAddress]
+            });
+          }
         }
         that.processYunfei();
       }
@@ -230,42 +153,32 @@ Page({
   processYunfei: function () {
     var that = this;
     var goodsList = this.data.goodsList;
-    var goodsJsonStr = "[";
-    var isNeedLogistics = 0;
-    var allGoodsPrice = 0;
-
-    for (let i = 0; i < goodsList.length; i++) {
-      let carShopBean = goodsList[i];
-      if (carShopBean.logistics) {
-        isNeedLogistics = 1;
-      }
-      allGoodsPrice += carShopBean.price * carShopBean.number;
-
-      var goodsJsonStrTmp = '';
-      if (i > 0) {
-        goodsJsonStrTmp = ",";
-      }
-
-
-      let inviter_id = 0;
-      let inviter_id_storge = wx.getStorageSync('inviter_id_' + carShopBean.goodsId);
-      if (inviter_id_storge) {
-        inviter_id = inviter_id_storge;
-      }
-
-
-      goodsJsonStrTmp += '{"goodsId":' + carShopBean.goodsId + ',"number":' + carShopBean.number + ',"propertyChildIds":"' + carShopBean.propertyChildIds + '","logisticsType":0, "inviter_id":' + inviter_id + '}';
-      goodsJsonStr += goodsJsonStrTmp;
-
-
+    var count = 0;
+    for (var i = 0; i < goodsList.length; i++) {
+      var curItem = goodsList[i];
+      count += curItem.Number;
     }
-    goodsJsonStr += "]";
-    //console.log(goodsJsonStr);
-    that.setData({
-      isNeedLogistics: isNeedLogistics,
-      goodsJsonStr: goodsJsonStr
-    });
-    that.createOrder();
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx/GetExpressPrice',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        CityName: that.data.curAddressData.AddressCity,
+        count: count
+      },
+      success: (res) => {
+        if (res.data.state == 1) {
+          that.setData({
+            yunPrice: res.data.ExpressFee
+          });
+          that.setData({
+            allGoodsAndYunPrice: (res.data.ExpressFee + that.data.allGoodsPrice)
+          });
+        }
+      }
+    })
   },
   addAddress: function () {
     wx.navigateTo({

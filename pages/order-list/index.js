@@ -3,7 +3,7 @@ var app = getApp()
 Page({
   data: {
     statusType: ["待付款", "待发货", "待收货", "待评价", "已完成"],
-    currentType: 0,
+    currentType: 1,
     tabClass: ["", "", "", "", ""]
   },
 
@@ -14,9 +14,9 @@ Page({
       count++;
     }
     if (count == 0) {
-      var curType = 0;
+      var curType = 1;
     } else {
-      var curType = e.currentTarget.dataset.index;
+      var curType = e.currentTarget.dataset.index+1;
     }
     this.data.currentType = curType
     this.setData({
@@ -60,45 +60,7 @@ Page({
     var that = this;
     var orderId = e.currentTarget.dataset.id;
     var money = e.currentTarget.dataset.money;
-    wx.request({
-      url: app.siteInfo.url + app.siteInfo.subDomain + '/user/amount',
-      data: {
-        token: app.globalData.token
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          // res.data.data.balance
-          money = money - res.data.data.balance;
-          if (money <= 0) {
-            // 直接使用余额支付
-            wx.request({
-              url: app.siteInfo.url + app.siteInfo.subDomain + '/order/pay',
-              method: 'POST',
-              header: {
-                'content-type': 'application/x-www-form-urlencoded'
-              },
-              data: {
-                token: app.globalData.token,
-                orderId: orderId
-              },
-              success: function (res2) {
-                wx.reLaunch({
-                  url: "/pages/my/index"
-                });
-              }
-            })
-          } else {
-            wxpay.wxpay(app, money, orderId, "/pages/my/index");
-          }
-        } else {
-          wx.showModal({
-            title: '错误',
-            content: '无法获取用户资金信息',
-            showCancel: false
-          })
-        }
-      }
-    })
+    wxpay.wxpay(app, money, orderId, "/pages/index/index");
   },
   onLoad: function (e) {
     var that = this;
@@ -108,7 +70,7 @@ Page({
     this.setData({
       currentType: currentType
     });
-    this.statusTap(e);
+    // this.statusTap(e);
   },
   onReady: function () {
     // 生命周期函数--监听页面初次渲染完成
@@ -161,26 +123,33 @@ Page({
     wx.showLoading();
     var that = this;
     var postData = {
-      token: app.globalData.token
+      
     };
-    postData.status = that.data.currentType;
-    this.getOrderStatistics();
+    postData.Status = that.data.currentType;
+    postData.UserId = app.globalData.userInfo.Id;
+    postData.skip = 0;
+    postData.take = 10;
+    // this.getOrderStatistics();
     wx.request({
-      url: app.siteInfo.url + app.siteInfo.subDomain + '/order/list',
+      url: app.globalData.urls + '/MyGoods.asmx/GetOrderList',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: postData,
       success: (res) => {
         wx.hideLoading();
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           that.setData({
-            orderList: res.data.data.orderList,
-            logisticsMap: res.data.data.logisticsMap,
-            goodsMap: res.data.data.goodsMap
+            orderList: res.data.obj,
+            // logisticsMap: res.data.data.logisticsMap,
+            // goodsMap: res.data.data.goodsMap
           });
         } else {
           this.setData({
             orderList: null,
-            logisticsMap: {},
-            goodsMap: {}
+            // logisticsMap: {},
+            // goodsMap: {}
           });
         }
       }

@@ -13,6 +13,8 @@ function wxpay(app, money, orderId, redirectUrl) {
       "content-type": "application/x-www-form-urlencoded"
     },
     data: {
+      OrderGroup: orderId,
+      openId: app.globalData.openId
     },
     success: function(res){
       if (res.data.state == 1){
