@@ -22,71 +22,21 @@
       </block>
     </view>
   </view>
-  <view class="swiper-container" wx:if="{{goodsDetail.basicInfo.videoId}}">
-    <video src="{{videoMp4Src}}" autoplay="true" loop="true" style='width:100%'></video>
-  </view>
   <view class="goods-info">
     <view class="goods-left">
       <view class="goods-title">{{goodsDetail.Title}}</view>
       <view class="goods-characteristic">{{goodsDetail.Info}}</view>
-      <block wx:if="{{goodsDetail.basicInfo.pingtuan == true}}">
-        <view class="goods-ptuan-box">
-          <view class="goods-ptuan">
-            拼团价 Ұ
-            <text>{{goodsDetail.basicInfo.pingtuanPrice}}</text>
-          </view>
-          <view class="goods-ptuan-info">
-            <text class="txa">{{pingtuan.numberPersion}}人开团</text>
-            <text class="txb">原价 Ұ{{selectSizePrice}}</text>
-          </view>
-          <view class="goods-right">已团{{pingtuan.numberSucccess}}件</view>
-        </view>
-      </block>
-      <block wx:if="{{goodsDetail.basicInfo.pingtuan == false}}">
+      <block wx:if="{{true}}">
         <view class="goods-price">Ұ {{selectSizePrice}}</view>
         <view class="goods-originalPrice">Ұ {{goodsDetail.OriginalPrice}}</view>
         <view class="piangjia">
-          已售 {{goodsDetail.basicInfo.numberOrders}}
+          已售 {{goodsDetail.Sales}}
         </view>
       </block>
     </view>
   </view>
-  <view class="ptuan-info-box" wx:if="{{goodsDetail.basicInfo.pingtuan == true}}">
-    <view class="pinfo-title">拼团流程</view>
-    <view class="pinfo-list-box">
-      <view class="pinfo-list">
-        <image src="../../images/pingtuan/1.png" />
-        <text>支付开团或参团</text>
-      </view>
-      <view class="pinfo-list">
-        <image src="../../images/pingtuan/2.png" />
-        <text>邀请好友一起拼团</text>
-      </view>
-      <view class="pinfo-list">
-        <image src="../../images/pingtuan/3.png" />
-        <text>达到人数分别发货</text>
-      </view>
-      <view class="pinfo-list">
-        <image src="../../images/pingtuan/4.png" />
-        <text>人数不够自动退款</text>
-      </view>
-    </view>
-  </view>
-  <view class="ptuan-user-box" wx:if="{{goodsDetail.basicInfo.pingtuan == true && pingList}}">
-    <view class="ptuan-user-title">参加以下网友的团，组团成功立即发货</view>
-    <view class="ptuan-user-list" wx:for="{{pingList}}" wx:key="{{index}}" bindtap="addPingTuan" data-id="{{item.id}}" data-uid="{{item.uid}}">
-      <image src="{{item.apiExtUser.avatarUrl}}" />
-      <view class="ptuan-user-info-box">
-        <view class="ptuan-user-name">
-          <text>{{item.apiExtUser.nick}}</text>
-          <text>还差{{pingtuan.numberPersion - item.helpNumber}}人成团</text>
-        </view>
-      </view>
-      <view class="ptuan-user-btn">去参团></view>
-    </view>
-  </view>
   <view wx:if="{{hasMoreSelect}}" class="row-arrow" bindtap="bindGuiGeTap">
-    {{selectSize}}
+    <text>{{selectSize}}</text>
     <image src="../../images/arrow-right.png"></image>
   </view>
   <view class="tab-header" bindtap="tabFun">
@@ -126,7 +76,7 @@
       <button open-type="share"></button>
     </image>
   </view>
-  <block wx:if="true">
+  <block wx:if="{{true}}">
     <view class="footer-box">
       <view class="box-list">
         <image src="../../images/goods_service.png"></image>
@@ -136,7 +86,7 @@
         <image src="../../images/shopping_cart.png"></image>
         <view class="shop-num">{{shopNum}}</view>
       </view>
-      <view class="box-list" bindtap="{{favicon == 0 ? 'fav':'del'}}">
+      <view class="box-list" bindtap="{{favicon == 0 ? 'fav':'del'}}" hidden='true'>
         <image wx:if="{{favicon == 0}}" src="../../images/goods_collect.png"></image>
         <image wx:if="{{favicon == 1}}" src="../../images/goods_collect_checked.png"></image>
       </view>
@@ -153,22 +103,31 @@
     <view class="popup-contents">
       <view class="pop-goods-info">
         <view class="pop-img-box">
-          <image src="{{goodsDetail.basicInfo.pic}}" class="goods-thumbnail" />
+          <image src="{{goodsDetail.ImgUrl[0]}}" class="goods-thumbnail" />
         </view>
         <view class="pop-goods-des">
-          <view class="pop-goods-title">{{goodsDetail.basicInfo.name}}</view>
+          <view class="pop-goods-title">{{goodsDetail.Title}}</view>
           <view class="pop-goods-price" wx:if="{{shopType =='addShopCar' || shopType =='tobuy'}}">¥ {{selectSizePrice}}</view>
           <view class="pop-goods-price" wx:if="{{shopType =='pingtuan'}}">¥ {{selectptPrice}}</view>
         </view>
         <view class="pop-goods-close" bindtap="closePopupTap"></view>
       </view>
       <view class="size-label-box">
-        <block wx:for="{{goodsDetail.properties}}" wx:for-item="property" wx:for-index="idx" wx:key="id">
-          <view class="label">{{property.name}}</view>
+        <block wx:if="{{goodsDetail.arrNormInfo}}">
+          <view class="label">选择规格</view>
           <view class="label-item-box">
-            <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{property.childsCurGoods}}" wx:key="id" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{property.id}}" data-propertyname="{{property.name}}" data-propertychildindex="{{index}}"
-              data-propertychildid="{{item.id}}" data-propertychildname="{{item.name}}">
-              {{item.name}}
+            <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{goodsDetail.arrNormInfo}}" wx:key="id" bindtap="normalTap" data-propertyindex="{{idx}}" data-propertyid="{{normInfo.FirstNormId}}" data-propertyname="{{normInfo.Title}}" data-propertychildindex="{{index}}"
+              data-propertychildid="{{normInfo.FirstNormId}}" data-propertychildname="{{normInfo.NormName}}">
+              {{item.NormName}}
+            </view>
+          </view>
+        </block>
+        <block wx:if="{{goodsDetail.arrColor}}">
+          <view class="label">选择颜色</view>
+          <view class="label-item-box">
+            <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{goodsDetail.arrColor}}" wx:key="id" bindtap="colorTap" data-propertyindex="{{idx}}" data-propertyid="{{colorInfo.SecondNormId}}" data-propertyname="{{colorInfo.ColorName}}" data-propertychildindex="{{index}}"
+              data-propertychildid="{{colorInfo.SecondNormId}}" data-propertychildname="{{colorInfo.ColorName}}">
+              {{item.ColorName}}
             </view>
           </view>
         </block>
@@ -185,7 +144,6 @@
       </view>
       <view class="popup-join-btn" wx:if="{{shopType =='addShopCar'}}" bindtap="addShopCar">加入购物车</view>
       <view class="popup-join-btn" wx:if="{{shopType =='tobuy'}}" bindtap="buyNow"> 立即购买</view>
-      <view class="popup-join-btn" wx:if="{{shopType =='pingtuan'}}" bindtap="buyPingtuan"> 立即开团</view>
     </view>
   </view>
 </view>

@@ -185,7 +185,7 @@ Page({
         "content-type": "application/x-www-form-urlencoded"
       },
       data: {
-        TypeId: '1'
+        TypeId: '2'
       },
       success: function (res) {
         if (res.data.state == 1) {
@@ -203,7 +203,7 @@ Page({
         "content-type": "application/x-www-form-urlencoded"
       },
       data: {
-        TypeId: '1'
+        TypeId: '3'
       },
       success: function (res) {
         if (res.data.state == 1) {
@@ -221,7 +221,7 @@ Page({
         "content-type": "application/x-www-form-urlencoded"
       },
       data: {
-        TypeId: '1'
+        TypeId: '4'
       },
       success: function (res) {
         if (res.data.state == 1) {

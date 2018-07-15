@@ -68,6 +68,12 @@ swiper-item image {
   border-bottom: 30rpx solid #f5f5f5;
 }
 
+.row-arrow text{
+    font-size: 26rpx;
+    line-height: 20rpx;
+    margin-left: 30rpx;
+}
+
 .row-arrow image {
   width: 20rpx;
   height: 42rpx;
@@ -380,7 +386,7 @@ swiper-item image {
 }
 
 .box-list {
-  width: 14%;
+  width: 18%;
   border-right: 1px solid #f2f2f2;
   position: relative;
   display: flex;
@@ -419,7 +425,7 @@ swiper-item image {
 }
 
 .box-title {
-  width: 29%;
+  width: 32%;
   font-size: 30rpx;
   line-height: 44rpx;
   text-align: center;

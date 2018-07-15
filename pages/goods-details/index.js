@@ -9,6 +9,7 @@ Page({
     interval: 10000,
     duration: 500,
     goodsDetail: {},
+    GoodId:'',
     swiperCurrent: 0,
     hasMoreSelect: false,
     selectSize: "选择规格：",
@@ -30,6 +31,10 @@ Page({
       curBdIndex: 0
     },
     wxlogin: true,
+    isNormSeleced: true,
+    isColorSelected: true,
+    selectedNorm: {},
+    selectedColor: {},
   },
 
   //事件处理函数
@@ -41,6 +46,8 @@ Page({
   },
   onLoad: function (e) {
     var that = this;
+
+    that.data.GoodId = e.id;
 
     that.setData({
       wxLogin: app.globalData.hasAuthorized
@@ -92,12 +99,49 @@ Page({
 
         if(res.data.state == 1){
           that.data.goodsDetail = res.data.obj;
-          that.data.goodsDetail.ImgUrl = ["http://myadm.holdcity.com/GoodsImg/20180624/201806242155255964.jpg", "http://myadm.holdcity.com/GoodsImg/20180624/201806242155255964.jpg", "http://myadm.holdcity.com/GoodsImg/20180624/201806242155255964.jpg"];
+
+          that.setData({
+            goodsDetail: that.data.goodsDetail,
+            selectSizePrice: that.data.goodsDetail.OriginalPrice
+          });
+
+          wx.request({
+            url: app.globalData.urls + '/MyGoods.asmx/GetMyGoodsNorm',
+            method: "POST",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            data: {
+              GoodId: e.id
+            },
+            success: function (res) {
+
+              if (res.data.state == 1) {
+                that.data.goodsDetail.arrNormInfo = res.data.obj.norm;
+                if (that.data.goodsDetail.arrNormInfo && that.data.goodsDetail.arrNormInfo.length > 0){
+                  that.data.isNormSeleced = false;
+                }
+                that.data.goodsDetail.arrColor = res.data.obj.color;
+                if (that.data.goodsDetail.arrColor && that.data.goodsDetail.arrColor.length > 0) {
+                  that.data.isColorSelected = false;
+                }
+
+                that.setData({
+                  goodsDetail: that.data.goodsDetail,
+                  hasMoreSelect: true,
+                  selectSizePrice: that.data.goodsDetail.OriginalPrice
+                });
+                
+              }
+            }
+          })
+
         }
-        
-        WxParse.wxParse('article', 'html', res.data.obj.Title, that, 5);
+
+        WxParse.wxParse('article', 'html', res.data.obj.Detail, that, 5);
       }
     })
+  
     this.reputation(e.id);
   },
   goShopCar: function () {
@@ -117,32 +161,7 @@ Page({
     });
     this.bindGuiGeTap();
   },
-  pingtuan: function () {
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/open',
-      data: {
-        token: app.globalData.token,
-        goodsId: that.data.goodsDetail.basicInfo.id
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.setData({
-            pingtuanOpenId: res.data.data.id,
-            shopType: "pingtuan"
-          });
-          that.bindGuiGeTap();
-        } else {
-          wx.showModal({
-            title: '错误',
-            content: res.data.msg,
-            showCancel: false
-          })
-        }
-      }
-    })
 
-  },
   /**
    * 规格选择弹出框
    */
@@ -181,107 +200,133 @@ Page({
    * 选择商品规格
    * @param {Object} e
    */
-  labelItemTap: function (e) {
+  normalTap: function (e) {
     var that = this;
     // 取消该分类下的子栏目所有的选中状态
-    var childs = that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods;
+    var childs = that.data.goodsDetail.arrNormInfo;
     for (var i = 0; i < childs.length; i++) {
-      that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods[i].active = false;
+      that.data.goodsDetail.arrNormInfo[i].active = false;
     }
     // 设置当前选中状态
-    that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods[e.currentTarget.dataset.propertychildindex].active = true;
-    // 获取所有的选中规格尺寸数据
-    var needSelectNum = that.data.goodsDetail.properties.length;
-    var curSelectNum = 0;
-    var propertyChildIds = "";
-    var propertyChildNames = "";
-    for (var i = 0; i < that.data.goodsDetail.properties.length; i++) {
-      childs = that.data.goodsDetail.properties[i].childsCurGoods;
-      for (var j = 0; j < childs.length; j++) {
-        if (childs[j].active) {
-          curSelectNum++;
-          propertyChildIds = propertyChildIds + that.data.goodsDetail.properties[i].id + ":" + childs[j].id + ",";
-          propertyChildNames = propertyChildNames + that.data.goodsDetail.properties[i].name + ":" + childs[j].name + "  ";
-        }
-      }
-    }
-    var canSubmit = false;
-    if (needSelectNum == curSelectNum) {
-      canSubmit = true;
-    }
-    // 计算当前价格
-    if (canSubmit) {
-      wx.request({
-        url: app.siteInfo.url + app.siteInfo.subDomain + '/shop/goods/price',
-        data: {
-          goodsId: that.data.goodsDetail.basicInfo.id,
-          propertyChildIds: propertyChildIds
-        },
-        success: function (res) {
+    that.data.goodsDetail.arrNormInfo[e.currentTarget.dataset.propertychildindex].active = true;
+    that.data.isNormSeleced = true;
 
-          that.setData({
-            selectSizePrice: res.data.data.price,
-            propertyChildIds: propertyChildIds,
-            propertyChildNames: propertyChildNames,
-            buyNumMax: res.data.data.stores,
-            buyNumber: (res.data.data.stores > 0) ? 1 : 0,
-            selectptPrice: res.data.data.pingtuanPrice
-          });
-        }
-      })
+    var normInfo = that.data.goodsDetail.arrNormInfo[e.currentTarget.dataset.propertychildindex];
+    that.data.selectedNorm = normInfo;
+    that.data.selectSizePrice = normInfo.NowPrice;
+    that.data.buyNumMax = normInfo.Number;
+    if (that.data.buyNumber > that.data.buyNumMax){
+      that.data.buyNumber = that.data.buyNumMax;
     }
 
-    this.setData({
+    that.setData({
       goodsDetail: that.data.goodsDetail,
-      canSubmit: canSubmit
-    })
+      buyNumber: that.data.buyNumber,
+      selectSizePrice: that.data.selectSizePrice
+    });
 
   },
+
+  /**
+     * 选择颜色
+     * @param {Object} e
+     */
+  colorTap: function (e) {
+    var that = this;
+    // 取消该分类下的子栏目所有的选中状态
+    var childs = that.data.goodsDetail.arrColor;
+    for (var i = 0; i < childs.length; i++) {
+      that.data.goodsDetail.arrColor[i].active = false;
+    }
+    // 设置当前选中状态
+    that.data.goodsDetail.arrColor[e.currentTarget.dataset.propertychildindex].active = true;
+    that.data.isColorSelected = true;
+
+    var colorInfo = that.data.goodsDetail.arrColor[e.currentTarget.dataset.propertychildindex];
+    that.data.selectedColor = colorInfo;
+   
+    that.setData({
+      goodsDetail: that.data.goodsDetail,
+    });
+
+  },
+
   /**
   * 加入购物车
   */
   addShopCar: function () {
-    if (this.data.goodsDetail.properties && !this.data.canSubmit) {
-      if (!this.data.canSubmit) {
+    if (this.data.goodsDetail.arrNormInfo) {
+      
+      if (!this.data.isNormSeleced || !this.data.selectedNorm) {
         wx.showModal({
           title: '提示',
           content: '请选择商品规格！',
           showCancel: false
         })
+        this.bindGuiGeTap();
+        return;
       }
-      this.bindGuiGeTap();
-      return;
     }
+
+    if (this.data.goodsDetail.arrColor) {
+
+      if (!this.data.isColorSelected || !this.data.selectedColor) {
+        wx.showModal({
+          title: '提示',
+          content: '请选择颜色！',
+          showCancel: false
+        })
+        this.bindGuiGeTap();
+        return;
+      }
+      
+    }
+
     if (this.data.buyNumber < 1) {
       wx.showModal({
         title: '提示',
         content: '购买数量不能为0！',
         showCancel: false
       })
+      this.bindGuiGeTap();
       return;
     }
-    //组建购物车
-    var shopCarInfo = this.bulidShopCarInfo();
 
-    this.setData({
-      shopCarInfo: shopCarInfo,
-      shopNum: shopCarInfo.shopNum
-    });
+    var norm = this.data.goodsDetail.arrNormInfo[0];
 
-    // 写入本地存储
-    wx.setStorage({
-      key: "shopCarInfo",
-      data: shopCarInfo
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx/AddMyCart',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        UserId: app.globalData.userInfo.Id,
+        BusinessId: this.data.goodsDetail.BusinessId,
+        GoodsId: this.data.GoodId,
+        FirstNormId: this.data.selectedNorm.FirstNormId,
+        FirstNormName: this.data.selectedNorm.NormName,
+        SecondNormId: this.data.selectedColor.SecondNormId,
+        SecondNormName: this.data.selectedColor.ColorName,
+        Number: this.data.buyNumber
+      },
+      success: function (res) {
+
+        if (res.data.state == 1) {
+          wx.showToast({
+            title: '加入购物车成功',
+            icon: 'success',
+            duration: 2000
+          })
+        }else{
+          wx.showToast({
+            title: '加入购物车失败',
+            icon: 'fail',
+            duration: 2000
+          })
+        }
+      }
     })
-    this.closePopupTap();
-    wx.showToast({
-      title: '加入购物车成功',
-      icon: 'success',
-      duration: 2000
-    })
-    //console.log(shopCarInfo);
-
-    //shopCarInfo = {shopNum:12,shopList:[]}
   },
 	/**
 	  * 立即购买
@@ -627,8 +672,6 @@ Page({
   },
   onPullDownRefresh: function (e) {
     var that = this;
-    that.goPingtuan();
-    that.goPingList();
     wx.stopPullDownRefresh();
   },
   onShow: function () {
@@ -639,8 +682,6 @@ Page({
           wxlogin: false
         })
       }
-      that.goPingtuan();
-      that.goPingList();
     }, 1000)
   },
   userlogin: function (e) {
