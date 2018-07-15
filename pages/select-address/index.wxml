@@ -9,13 +9,13 @@
     <view class="a-address" wx:for-items="{{addressList}}" wx:key="{{index}}">
       <view class="left-text {{item.isDefault? 'active':''}}" bindtap="selectTap" data-id="{{item.id}}">
         <view class="name-tel">
-          {{item.linkMan}} {{item.mobile}}
+          {{item.AddressName}} {{item.AddressPhone}}
         </view>
         <view class="address-box">
-          {{item.address}}
+          {{item.AddressProvince}}{{item.AddressCity}}{{item.AddressArea}}{{item.AddressAdd}}
         </view>
       </view>
-      <view class="right-edit" bindtap="editAddess" data-id="{{item.id}}"></view>
+      <view class="right-edit" bindtap="editAddess" data-id="{{item.Id}}"></view>
     </view>
   </view>
   <view hidden="{{loadingMoreHidden ? true : false}}" class="no-more-goods">

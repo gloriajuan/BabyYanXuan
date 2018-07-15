@@ -55,12 +55,12 @@ Page({
       })
       return
     }
-    var cityId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].id;
+    var cityId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].name;
     var districtId;
     if (this.data.selDistrict == "请选择" || !this.data.selDistrict) {
       districtId = '';
     } else {
-      districtId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].id;
+      districtId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].name;
     }
     if (address == "") {
       wx.showModal({
@@ -78,29 +78,33 @@ Page({
       })
       return
     }
-    var apiAddoRuPDATE = "add";
+    var apiAddoRuPDATE = "AddMyAddress";
     var apiAddid = that.data.id;
     if (apiAddid) {
-      apiAddoRuPDATE = "update";
+      apiAddoRuPDATE = "UpdateMyAddress";
     } else {
       apiAddid = 0;
     }
     wx.request({
-      url: app.globalData.urls + '/user/shipping-address/' + apiAddoRuPDATE,
+      url: app.globalData.urls + '/MyGoods.asmx/' + apiAddoRuPDATE,
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        token: app.globalData.token,
-        id: apiAddid,
-        provinceId: commonCityData.cityData[this.data.selProvinceIndex].id,
-        cityId: cityId,
-        districtId: districtId,
-        linkMan: linkMan,
-        address: address,
-        mobile: mobile,
-        code: code,
-        isDefault: 'true'
+        Id: apiAddid,
+        UserId: app.globalData.userInfo.Id,
+        AddressProvince: commonCityData.cityData[this.data.selProvinceIndex].name,
+        AddressCity: cityId,
+        AddressArea: districtId,
+        AddressName: linkMan,
+        AddressAdd: address,
+        AddressPhone: mobile,
+        AddressPostal: code,
+        IsDefault: '1'
       },
       success: function (res) {
-        if (res.data.code != 0) {
+        if (res.data.state != 1) {
           // 登录错误 
           wx.hideLoading();
           wx.showModal({
@@ -185,22 +189,26 @@ Page({
       // 初始化原数据
       wx.showLoading();
       wx.request({
-        url: app.globalData.urls + '/user/shipping-address/detail',
+        url: app.globalData.urls + '/MyGoods.asmx/GetMyAddressDetail',
+        method: "POST",
+        header: {
+          "content-type": "application/x-www-form-urlencoded"
+        },
         data: {
-          token: app.globalData.token,
-          id: id
+          Id: id
         },
         success: function (res) {
           wx.hideLoading();
-          if (res.data.code == 0) {
+          if (res.data.state == 1) {
+            var addressArray = res.data.obj;
             that.setData({
               id: id,
-              addressData: res.data.data,
-              selProvince: res.data.data.provinceStr,
-              selCity: res.data.data.cityStr,
-              selDistrict: res.data.data.areaStr
+              addressData: addressArray[0],
+              selProvince: addressArray[0].AddressProvince,
+              selCity: addressArray[0].AddressCity,
+              selDistrict: addressArray[0].AddressArea
             });
-            that.setDBSaveAddressId(res.data.data);
+            that.setDBSaveAddressId(addressArray[0]);
             return;
           } else {
             wx.showModal({
@@ -243,13 +251,26 @@ Page({
       success: function (res) {
         if (res.confirm) {
           wx.request({
-            url: app.siteInfo.url + app.siteInfo.subDomain + '/user/shipping-address/delete',
+            url: app.globalData.urls +'/MyGoods.asmx/DeleteMyAddress',
+            method: "POST",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
             data: {
-              token: app.globalData.token,
-              id: id
+              UserId: app.globalData.userInfo.Id,
+              Id: id
             },
             success: (res) => {
-              wx.navigateBack({})
+              if (res.data.state == 1) {
+                wx.navigateBack({})
+              }else{
+                wx.showModal({
+                  title: '提示',
+                  content: '删除地址失败',
+                  showCancel: false
+                })
+              }
+             
             }
           })
         } else if (res.cancel) {
