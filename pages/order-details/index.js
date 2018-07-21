@@ -19,14 +19,17 @@ Page({
       var that = this
       
       wx.request({
-        url: app.globalData.urls + '/order/detail',
+        url: app.globalData.urls + '/MyGoods.asmx/GetOrderInfo',
+        method: "POST",
+        header: {
+          "content-type": "application/x-www-form-urlencoded"
+        },
         data: {
-          token: app.globalData.token,
-          id: that.data.orderId
+          OrderGroup: that.data.orderId
         },
         success: (res) => {
           wx.hideLoading();
-          if (res.data.code != 0) {
+          if (res.data.state != 1) {
             wx.showModal({
               title: '错误',
               content: res.data.msg,
@@ -34,21 +37,23 @@ Page({
             })
             return;
           }
+          var arrExpressInfo = JSON.parse(res.data.obj.ExpressInfo);
+          var orderInfo = res.data.obj;
+          orderInfo.id = that.data.orderId;
+          orderInfo.arrExpressInfo = arrExpressInfo;
+
+          var province = orderInfo.AddressProvince == null ? "" : orderInfo.AddressProvince;
+          var city = orderInfo.AddressCity == null ? "" : orderInfo.AddressCity;
+          var area = orderInfo.AddressArea == null ? "" : orderInfo.AddressArea;
+          var detail = orderInfo.AddressAdd == null ? "" : orderInfo.AddressAdd;
+
+          orderInfo.Address =  province + city + area + detail;
+
           that.setData({
-            orderDetail: res.data.data
+            orderDetail: orderInfo
           });
         }
       })
-      var yunPrice = parseFloat(this.data.yunPrice);
-      var allprice = 0;
-      var goodsList = this.data.goodsList;
-      for (var i = 0; i < goodsList.length; i++) {
-        allprice += parseFloat(goodsList[0].price) * goodsList[0].number;
-      }
-      this.setData({
-        allGoodsPrice: allprice,
-        yunPrice: yunPrice
-      });
     },
     wuliuDetailsTap:function(e){
       var orderId = e.currentTarget.dataset.id;

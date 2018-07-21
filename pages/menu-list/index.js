@@ -16,9 +16,13 @@ Page({
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/shop/goods/list',
+      url: app.globalData.urls + '/mybill.asmx/GetTypeGoodsList',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        categoryId: e.id
+        SecondTypeId: e.id
       },
       success: function (res) {
         wx.hideLoading();
@@ -27,14 +31,14 @@ Page({
           loadingMoreHidden: true
         });
         var goods = [];
-        if (res.data.code != 0 || res.data.data.length == 0) {
+        if (res.data.state != 1 || res.data.obj.length == 0) {
           that.setData({
             loadingMoreHidden: false,
           });
           return;
         }
-        for (var i = 0; i < res.data.data.length; i++) {
-          goods.push(res.data.data[i]);
+        for (var i = 0; i < res.data.obj.length; i++) {
+          goods.push(res.data.obj[i]);
         }
         that.setData({
           goods: goods,

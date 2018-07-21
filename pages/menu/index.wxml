@@ -41,17 +41,17 @@
   </view>
 </view>
 <view hidden="{{search}}" class="search-box {{iponesc}}">
-  <view hidden="{{searchidden}}" class="goods-box" wx:for-items="{{searchs}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
+  <view hidden="{{searchidden}}" class="goods-box" wx:for-items="{{searchs}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.GoodsId}}">
     <view class="img-box">
-      <image src="{{item.pic}}_m" class="image" mode="widthFix" lazy-load="true" />
+      <image src="{{item.ImgUrl}}" class="image" mode="widthFix" lazy-load="true" />
       <view class="goods-characteristic">
-        <text>{{item.characteristic}}</text>
+        <text>{{item.Info}}</text>
       </view>
     </view>
-    <view class="goods-title">{{item.name}}</view>
+    <view class="goods-title">{{item.Title}}</view>
     <view style='display:flex;'>
-      <view class="goods-price">Ұ{{item.minPrice}}</view>
-      <view class="goods-price-naver">已售{{item.numberOrders}}</view>
+      <view class="goods-price">Ұ{{item.Price}}</view>
+      <view class="goods-price-naver">已售{{item.Sales}}</view>
     </view>
   </view>
   <view hidden="{{nonehidden}}" class="goods-none">

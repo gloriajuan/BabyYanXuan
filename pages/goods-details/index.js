@@ -34,7 +34,7 @@ Page({
     isNormSeleced: true,
     isColorSelected: true,
     selectedNorm: {},
-    selectedColor: {},
+    selectedColor: null,
   },
 
   //事件处理函数
@@ -75,15 +75,22 @@ Page({
         }
       }
     })
-    this.getfav(e);
     // 获取购物车数据
-    wx.getStorage({
-      key: 'shopCarInfo',
-      success: function (res) {
-        that.setData({
-          shopCarInfo: res.data,
-          shopNum: res.data.shopNum
-        });
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx/GetCartNumber',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        UserId: app.globalData.userInfo.Id
+      },
+      success: function (res){
+        if(res.data.state == 1){
+          that.setData({
+            shopNum: res.data.CartNumber
+          });
+        }
       }
     })
     wx.request({
@@ -119,11 +126,13 @@ Page({
               if (res.data.state == 1) {
                 that.data.goodsDetail.arrNormInfo = res.data.obj.norm;
                 if (that.data.goodsDetail.arrNormInfo && that.data.goodsDetail.arrNormInfo.length > 0){
-                  that.data.isNormSeleced = false;
+                  that.data.goodsDetail.hasNormal = false;
                 }
                 that.data.goodsDetail.arrColor = res.data.obj.color;
                 if (that.data.goodsDetail.arrColor && that.data.goodsDetail.arrColor.length > 0) {
                   that.data.isColorSelected = false;
+                }else{
+                  that.data.goodsDetail.arrColor = null;
                 }
 
                 that.setData({
@@ -306,8 +315,8 @@ Page({
         GoodsId: this.data.GoodId,
         FirstNormId: this.data.selectedNorm.FirstNormId,
         FirstNormName: this.data.selectedNorm.NormName,
-        SecondNormId: this.data.selectedColor.SecondNormId,
-        SecondNormName: this.data.selectedColor.ColorName,
+        SecondNormId: this.data.selectedColor == null ? 0 : this.data.selectedColor.SecondNormId,
+        SecondNormName: this.data.selectedColor == null ? '' : this.data.selectedColor.ColorName,
         Number: this.data.buyNumber
       },
       success: function (res) {

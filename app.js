@@ -43,36 +43,13 @@ App({
         }
       }
     });
-    wx.request({
-      url: that.globalData.urls + "/shop/goods/kanjia/list",
-      data: {},
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.globalData.kanjiaList = res.data.data.result;
-        }
-      }
-    });
-    that.login();
+    // that.login();
   },
   siteInfo: require("config.js"),
+  /*
   login: function () {
     var that = this;
-    var token = that.globalData.token;
-    if (token) {
-      wx.request({
-        url: that.globalData.urls + "/user/check-token",
-        data: {
-          token: token
-        },
-        success: function (res) {
-          if (res.data.code != 0) {
-            that.globalData.token = null;
-            that.login();
-          }
-        }
-      });
-      return;
-    }
+  
     wx.login({
       success: function (res) {
         wx.request({
@@ -90,6 +67,7 @@ App({
             if (res.data.state == 1) {
               that.globalData.usinfo = 0;
               that.globalData.openId = JSON.parse(res.data.JsonStr).openid;
+              that.globalData.unionId = JSON.parse(res.data.JsonStr).unionid;
 
               that.getAuthuriseInfo();
               return;
@@ -144,6 +122,7 @@ App({
       },
       data: {
         OpenId: that.globalData.openId,
+        UnionId: that.globalData.unionId,
         UserName: userInfo.nickName,
         HeadImgUrl: userInfo.avatarUrl
       },
@@ -159,6 +138,7 @@ App({
       }
     })
   },
+  */
 
   urls: function () {
     var that = this;

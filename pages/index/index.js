@@ -89,6 +89,107 @@ Page({
       }
     })
   },
+
+  login: function () {
+    var that = this;
+    wx.login({
+      success: function (res) {
+        wx.request({
+          url: app.globalData.urls + "/MyBill.asmx/GetWxOpenId",
+          method: "POST",
+          header: {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          data: {
+            appid: 'wxa4138ba5e260a760',
+            secret: '82da0d7ca8fb21234319d3de058743a7',
+            js_code: res.code
+          },
+          success: function (res) {
+            if (res.data.state == 1) {
+              app.globalData.usinfo = 0;
+              app.globalData.openId = JSON.parse(res.data.JsonStr).openid;
+              app.globalData.unionId = JSON.parse(res.data.JsonStr).unionid;
+
+              that.getAuthuriseInfo();
+              return;
+            }
+            if (res.data.state == 0) {
+              wx.hideLoading();
+              wx.showModal({
+                title: "提示",
+                content: "无法登录，请重试",
+                showCancel: false
+              });
+              return;
+            }
+          }
+        });
+      }
+    });
+  },
+  getAuthuriseInfo: function () {
+    var that = this;
+    wx.getSetting({
+      success: function (res) {
+        if (res.authSetting['scope.userInfo']) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+          wx.getUserInfo({
+            success: function (res) {
+              //调用我们的getUserInfo接口
+              that.saveUserInfo(res.userInfo);
+            }
+          })
+
+          app.globalData.hasAuthorized = true;
+
+          that.setData({
+            wxLogin: app.globalData.hasAuthorized
+          });
+
+        } else {
+          //未授权
+          // wx.authorize({
+          //   scope: '',
+          // })
+
+          app.globalData.hasAuthorized = false;
+
+          that.setData({
+            wxLogin: app.globalData.hasAuthorized
+          });
+        }
+      }
+    })
+  },
+
+  saveUserInfo: function (userInfo) {
+    var that = this;
+    wx.request({
+      url: app.globalData.urls + '/MyGoods.asmx/MyUserInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        OpenId: app.globalData.openId,
+        UnionId: app.globalData.unionId,
+        UserName: userInfo.nickName,
+        HeadImgUrl: userInfo.avatarUrl
+      },
+      success: function (res) {
+        if (res.data.state == 1) {
+          var Id = res.data.obj.Id;
+          userInfo.Id = Id;
+          userInfo.CartNumber = res.data.obj.CartNumber;
+          userInfo.Score = res.data.obj.Score;
+          userInfo.SignDay = res.data.obj.SignDay;
+          app.globalData.userInfo = userInfo;
+        }
+      }
+    })
+  },
+
   userlogin: function (e) {
     var that = this;
     var iv = e.detail.iv;
@@ -96,6 +197,10 @@ Page({
     var userInfo = e.detail.userInfo;
 
     var openId = app.globalData.openId;
+
+    if(null == openId){
+      return;
+    }
 
     wx.request({
       url: app.globalData.urls + '/MyGoods.asmx/MyUserInfo',
@@ -124,22 +229,12 @@ Page({
     })
   },
   onShow: function () {
-    var that = this;
-    setTimeout(function () {
-      if (!app.globalData.hasAuthorized) {
-        that.setData({
-          wxlogin: false
-        })
-        wx.hideTabBar();
-      }
-    }, 1000)
   },
   onLoad: function () {
     var that = this;
 
-    that.setData({
-      wxLogin: app.globalData.hasAuthorized
-    });
+    that.login();
+    // checkAuthetication();
 
     if (app.globalData.iphone==true){
       that.setData({iphone:true})

@@ -19,11 +19,11 @@
     <view class="a-order" wx:for-items="{{orderList}}" wx:key="{{index}}">
       <view class="order-date" bindtap="orderDetail" data-id="{{item.OrderGroup}}">
         <view class="date-box">下单时间：{{item.OrderTime}}</view>
-        <view class="status {{(item.Status==-1 || item.Status==5) ? '':'red'}}">{{item.StatusStr}}</view>
+        <view class="status {{(item.StatusInt==-1 || item.StatusInt==5) ? '':'red'}}">{{item.Status}}</view>
       </view>
       <view class="goods-info" bindtap="orderDetail" data-id="{{item.OrderGroup}}">
         <view class="goods-des">
-          <view>订单号:{{item.OrderGroup}} </view>
+          <view>订单号：{{item.OrderGroup}} </view>
           <view wx:if="{{item.Message && item.Message != ''}}">备注： {{item.Message}}</view>
         </view>
       </view>
@@ -36,8 +36,8 @@
       </view>
       <view class="price-box">
         <view class="total-price">合计：¥ {{item.TotalPrice}}</view>
-        <view class="btn cancel-btn" hidden="{{item.Status==1? fslse : true}}" bindtap="cancelOrderTap" data-id="{{item.OrderGroup}}">取消订单</view>
-        <view class="btn topay-btn" hidden="{{item.Status==1? fslse : true}}" bindtap="toPayTap" data-id="{{item.OrderGroup}}" data-money="{{item.TotalPrice}}">立即支付</view>
+        <view class="btn cancel-btn" hidden="{{item.StatusInt==1? fslse : true}}" bindtap="cancelOrderTap" data-id="{{item.OrderGroup}}">取消订单</view>
+        <view class="btn topay-btn" hidden="{{item.StatusInt==1? fslse : true}}" bindtap="toPayTap" data-id="{{item.OrderGroup}}" data-money="{{item.TotalPrice}}">立即支付</view>
       </view>
     </view>
 

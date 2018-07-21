@@ -35,15 +35,19 @@ Page({
   search: function(e){
     var that = this
     wx.request({
-      url: app.globalData.urls + '/shop/goods/list',
+      url: app.globalData.urls + '/MyGoods.asmx/SearchGoodsInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        nameLike: e.detail.value
+        Title: e.detail.value
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
           var searchs = [];
-          for (var i = 0; i < res.data.data.length; i++) {
-            searchs.push(res.data.data[i]);
+          for (var i = 0; i < res.data.obj.length; i++) {
+            searchs.push(res.data.obj[i]);
           }
           that.setData({
             searchs: searchs,
@@ -92,26 +96,37 @@ Page({
         "content-type": "application/x-www-form-urlencoded"
       },
       success: function (res) {
-        if (res.data.state == 1) {
-          that.setData({
-            banners: res.data.obj
-          });
-        }
-      }
-    }),
-    wx.request({
-      url: app.globalData.urls + '/MyBill.asmx/GetMyFirstType',
-      method: "POST",
-      header: {
-        "content-type": "application/x-www-form-urlencoded"
-      },
-      success: function (res) {
         var categories = [{ Id: 0, Name: "所有分类" }];
         if (res.data.state == 1) {
           wx.hideLoading();
           for (var i = 0; i < res.data.obj.length; i++) {
             if (res.data.obj[i].PId == 0) {
               categories.push(res.data.obj[i]);
+
+              wx.request({
+                url: app.globalData.urls + '/MyBill.asmx/GetMyFirstTypeBill',
+                method: "POST",
+                header: {
+                  "content-type": "application/x-www-form-urlencoded"
+                },
+                data: {
+                  FirstTypeId: res.data.obj[i].Id
+                },
+                success: function (res) {
+                  if (res.data.state == 0) {
+                    var banner = {};
+                    banner.ImgUrl = "http://myadm.holdcity.com/GoodsImg/20180624/201806242245158606.jpg";
+                    banner.Id=1;
+
+                    var arrbanners = [];
+                    arrbanners.push(banner);
+
+                    that.setData({
+                      banners: arrbanners//res.data.obj
+                    });
+                  }
+                }
+              })
             }
           }
         }//
