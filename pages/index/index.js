@@ -51,15 +51,85 @@ Page({
   kanjiaTap: function (e) {
     if (e.currentTarget.dataset.id != 0) {
       wx.navigateTo({
-        url: "/pages/kanjia-goods/index?id=" + e.currentTarget.dataset.id
+        url: "/pages/pingtuan-list/index?id=" + e.currentTarget.dataset.id
       })
     }
   },
-  tapSales: function (e) {
-    if (e.currentTarget.dataset.id != 0) {
-      wx.navigateTo({
-        url: e.currentTarget.dataset.id
-      })
+  tapSales: function () {
+    //去特惠列表
+    wx.navigateTo({
+      url: "/pages/menu-list/index?type=2"
+    })
+  },
+  tapTopic: function (){
+    //去专题列表
+    wx.navigateTo({
+      url: "/pages/topic-list/index?type=2"
+    })
+  },
+  tapRecommend: function(){
+    //去人气推荐列表
+    wx.navigateTo({
+      url: "/pages/menu-list/index?type=4"
+    })    
+  },
+  signInToGetIntergal: function () {
+    //去签到界面
+    wx.navigateTo({
+      url: "/pages/score/index?id="
+    }) 
+  },
+  goToRedBag: function () {
+    //红包
+    var that = this;
+    wx.request({
+      url: app.globalData.urls + '/MyBill.asmx/GetRedPackTimeInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        UserId: app.globalData.userInfo.Id
+      },
+      success: function (res) {
+        if (res.data.state == 1) {
+          var value1 = res.data.Value1;
+          wx.showModal({
+            title: '提示',
+            content: value1,
+            showCancel: false
+          })
+        }else{
+          wx.showToast({
+            title: '服务器忙，请稍后再试!',
+            icon: 'fail',
+            duration: 2000
+          })
+        }
+      }
+    })
+  },
+  tapButton: function(e){
+    var that = this;
+    //四个按钮事件
+    var buttonType = e.currentTarget.dataset.id;
+    switch(buttonType){
+      case 1:
+        //签到
+        that.signInToGetIntergal();
+        break;
+      case 2:
+        //红包
+        that.goToRedBag();
+        break;
+      case 3:
+        //热卖
+        that.tapRecommend();
+        break;
+      case 4:
+        //专题
+        that.tapTopic();
+        break;
     }
   },
   //弹窗优惠券关闭按钮
@@ -89,7 +159,6 @@ Page({
       }
     })
   },
-
   login: function () {
     var that = this;
     wx.login({
@@ -113,8 +182,7 @@ Page({
 
               that.getAuthuriseInfo();
               return;
-            }
-            if (res.data.state == 0) {
+            }else if (res.data.state == 0) {
               wx.hideLoading();
               wx.showModal({
                 title: "提示",
@@ -178,14 +246,19 @@ Page({
         HeadImgUrl: userInfo.avatarUrl
       },
       success: function (res) {
+        wx.hideLoading();
         if (res.data.state == 1) {
           var Id = res.data.obj.Id;
           userInfo.Id = Id;
           userInfo.CartNumber = res.data.obj.CartNumber;
           userInfo.Score = res.data.obj.Score;
           userInfo.SignDay = res.data.obj.SignDay;
+          userInfo.IsSign = res.data.obj.IsSign;
           app.globalData.userInfo = userInfo;
         }
+      },
+      fail: function(res){
+        wx.hideLoading();
       }
     })
   },
@@ -233,27 +306,14 @@ Page({
   onLoad: function () {
     var that = this;
 
+    // wx.showLoading();
+
     that.login();
     // checkAuthetication();
 
     if (app.globalData.iphone==true){
       that.setData({iphone:true})
     }
-    //首页顶部Logo
-    wx.request({
-      url: app.globalData.urls + '/banner/list',
-      data: {
-        type: 'toplogo'
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.setData({
-            toplogo: res.data.data[0].picUrl,
-            topname: wx.getStorageSync('mallName')
-          });
-        }
-      }
-    })
     //首页幻灯片
     wx.request({
       url: app.globalData.urls + '/MyBill.asmx/GetMyBill',
@@ -269,6 +329,23 @@ Page({
             that.setData({
               banners: res.data.obj
             });
+        }
+      }
+    })
+    //获取4个button
+    wx.request({
+      url: app.globalData.urls + '/MyBill.asmx/GetTopButtonInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+      },
+      success: function (res) {
+        if (res.data.state == 1) {
+          that.setData({
+            sales: res.data.obj
+          });
         }
       }
     })
@@ -323,32 +400,6 @@ Page({
           that.setData({
             topgoods: res.data.obj
           });
-          wx.request({
-            url: app.globalData.urls + '/shop/goods/list',
-            data: {
-              recommendStatus: 1,
-              pageSize: 10
-            },
-            success: function (res) {
-              that.setData({
-                goods: [],
-                loadingMoreHidden: true
-              });
-              var goods = [];
-              if (res.data.code != 0 || res.data.data.length == 0) {
-                that.setData({
-                  loadingMoreHidden: false,
-                });
-                return;
-              }
-              for (var i = 0; i < res.data.data.length; i++) {
-                goods.push(res.data.data[i]);
-              }
-              that.setData({
-                goods: goods,
-              });
-            }
-          })
         }
       }
     })

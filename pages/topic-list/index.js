@@ -1,7 +1,7 @@
 var app = getApp()
 Page({
   data: {
-
+    skipIndex:0,
   },
   tapContents: function (e) {
     wx.navigateTo({
@@ -11,45 +11,28 @@ Page({
   onLoad: function () {
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
-    wx.request({
-      url: app.globalData.urls + '/cms/category/list',
-      data: {
-      },
-      success: function (res) {
-        //console.log(res.data.data[0].id)
-        var topic = []
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.length; i++) {
-            topic.push(res.data.data[i]);
-          }
-          that.setData({
-            topics: topic,
-            activecmsid: res.data.data[0].id
-          });
-
-        }
-        that.gettapList(res.data.data[0].id)
-      }
-    })
-
+    
+    that.getTopicList(that.data.skipIndex);
   },
-  tapTopic: function (e) {
-    this.setData({
-      activecmsid: e.currentTarget.dataset.id
-    });
-    this.gettapList(this.data.activecmsid);
-  },
-  gettapList: function (cmsid) {
+
+  getTopicList: function (skipIndex) {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/cms/news/list',
+      url: app.globalData.urls + '/MyBill.asmx/GetMyBillList',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        TypeId: '3',
+        skip: skipIndex,
+        take: 10
+      },
       success: function (res) {
         var content = [];
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].categoryId == cmsid) {
-              content.push(res.data.data[i]);
-            }
+        if (res.data.state == 1) {
+          for (var i = 0; i < res.data.obj.length; i++) {
+            content.push(res.data.obj[i]);
           }
         }
         that.setData({

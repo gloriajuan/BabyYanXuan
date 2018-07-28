@@ -3,9 +3,10 @@
     <navigator open-type="navigateBack" delta="1" hover-class="navigator-hover">
       <image class="goback" src="../../images/goback.png" />
     </navigator>
-    <view class="header-name">分类商品</view>
+    <view class="header-name">{{pageTitle}}</view>
   </view>
-  <view class="goods-container">
+   <!-- <view class="goods-container">  -->
+   <scroll-view class="goods-container" scroll-y="true" bindscrolltolower="loadMoreData"> 
     <view class="goods-box" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.GoodsId}}">
       <view class="img-box">
         <image src="{{item.ImgUrl}}" class="image" mode="widthFix" lazy-load="true" />
@@ -18,8 +19,9 @@
         <view class="goods-price">Ұ{{item.Price}}</view>
         <view class="goods-price-naver">已售{{item.Sales}}</view>
       </view>
-    </view>
-  </view>
+    </view> 
+  </scroll-view> 
+   <!-- </view>  -->
   <view hidden="{{loadingMoreHidden ? true : false}}" class="no-more-goods">
     <image src="/images/empty_goods.png" class="no-order-img"></image>
     <view class="text">还没有商品呢</view>

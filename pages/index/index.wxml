@@ -17,13 +17,13 @@
       </block>
     </view>
   </view>
-  <view class="menu-container" hidden="true">
-    <view class="menu-list" wx:for="{{sales}}" wx:key="id" bindtap="tapSales" data-id="{{item.linkUrl}}">
-      <image src="{{item.picUrl}}" />
-      <text>{{item.title}}</text>
+  <view class="menu-container">
+    <view class="menu-list" wx:for="{{sales}}" wx:key="id" bindtap="tapButton" data-id="{{item.Id}}">
+      <image src="{{item.Img}}" />
+      <text>{{item.Title}}</text>
     </view>
   </view>
-  <view class="home-hover" hidden='true'></view>
+  <view class="home-hover"></view>
   <!--特惠-->
   <view wx:if="{{toptuan}}" class="pingtuna-container">
     <view class="pingtuna-title" bindtap="tapSales" data-id="{{toptuaninfo.remark}}">
@@ -33,18 +33,18 @@
     <view class="pingtuna-list" wx:for="{{toptuan}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.GoodsId}}">
       <view class="pingtuna-list-title">{{item.Title}}</view>
       <view wx:if="{{item.Info}}" class="pingtuna-list-text">{{item.Info}}</view>
-      <view wx:if="热卖" class="pingtuna-list-info">热卖</view>
+      <view wx:if="{{item.TitleTag}}" class="pingtuna-list-info">{{item.TitleTag}}</view>
       <image src="{{item.ImgUrl}}" />
     </view>
   </view>
   <!--精选专题-->
   <view wx:if="{{toptopics}}" class="topic-container" wx:key="id">
-    <view class="topic-title" bindtap="tapSales" data-id="{{item.GoodsId}}">
+    <view class="topic-title" bindtap="tapTopic" data-id="{{item.GoodsId}}">
       <text>专题</text>
       <image src="../../images/home_more.png" />
     </view>
     <scroll-view class="topic-list-box" scroll-x="true">
-      <view class="topic-list" wx:for-items="{{toptopics}}" wx:key="{{index}}" bindtap="toTopic" data-id="{{item.GoodsId}}">
+      <view class="topic-list" wx:for-items="{{toptopics}}" wx:key="{{index}}" bindtap="toTopic" data-id="{{item.SpecialId}}">
         <image src="{{item.ImgUrl}}" />
         <view class="topic-list-info">
           <view class="topic-list-info-title">{{item.Title}}</view>
@@ -56,7 +56,7 @@
   </view>
   <!--人气推荐-->
   <view wx:if="{{topgoods}}" class="goods-container">
-    <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.GoodsId}}">
+    <view class="goods-title" bindtap="tapRecommend" data-id="{{topgoods.GoodsId}}">
       <text>人气推荐</text>
       <image src="../../images/home_more.png" />
     </view>

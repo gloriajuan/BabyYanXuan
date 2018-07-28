@@ -35,6 +35,7 @@ Page({
     })
   },
   tapBanner: function (e) {
+    return;
     if (e.currentTarget.dataset.id != 0) {
       this.setData({
         home: 1
@@ -48,15 +49,18 @@ Page({
     var that = this;
     countdown(that);
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/MyBill.asmx/GetLoginPageInfo',
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
       data: {
-        key: 'mallName',
-        type: 'start'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 1) {
+          
           that.setData({
-            sales: res.data.data
+            lauchUp: res.data.obj
           });
         }
       }

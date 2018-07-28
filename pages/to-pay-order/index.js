@@ -111,7 +111,7 @@ Page({
         if (res.data.state == 1) {
           console.log("下单返回====" + JSON.stringify(res.data));
           wx.redirectTo({
-            url: "/pages/order-list/index"
+            url: "/pages/order-list/index?currentType=1"
           });
         }
       }

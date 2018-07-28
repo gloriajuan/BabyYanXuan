@@ -15,9 +15,9 @@
       </view>
     </view>
     <view class="type-list">
-      <view class="swiper-container">
+      <view class="swiper-container" hidden="{{!hasBanner}}">
         <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
-          <block wx:for="{{banners}}" wx:key="id">
+          <block wx:if="{{banners.length > 0 ? 'true' : 'false'}}" wx:for="{{banners}}" wx:key="id">
             <swiper-item>
               <image bindtap="toDetailsTap" data-id="{{item.Id}}" src="{{item.ImgUrl}}" class="slide-image" mode="widthFix" />
             </swiper-item>

@@ -3,7 +3,8 @@ Page({
     data:{
       orderId:0,
         goodsList:[],
-        yunPrice:"0.00"
+        yunPrice:"0.00",
+        expressInfo:[],
     },
     onLoad:function(e){
       var that = this;
@@ -37,11 +38,16 @@ Page({
             })
             return;
           }
-          var arrExpressInfo = JSON.parse(res.data.obj.ExpressInfo);
+          
           var orderInfo = res.data.obj;
           orderInfo.id = that.data.orderId;
-          orderInfo.arrExpressInfo = arrExpressInfo;
+          if (res.data.obj.ExpressInfo.length > 0) {
+            var arrExpressInfo = JSON.parse(res.data.obj.ExpressInfo);
+            orderInfo.arrExpressInfo = arrExpressInfo;
 
+            that.data.expressInfo = res.data.obj.ExpressInfo;
+          }
+          
           var province = orderInfo.AddressProvince == null ? "" : orderInfo.AddressProvince;
           var city = orderInfo.AddressCity == null ? "" : orderInfo.AddressCity;
           var area = orderInfo.AddressArea == null ? "" : orderInfo.AddressArea;
@@ -56,9 +62,11 @@ Page({
       })
     },
     wuliuDetailsTap:function(e){
+      return;
+      var that = this;
       var orderId = e.currentTarget.dataset.id;
       wx.navigateTo({
-        url: "/pages/wuliu/index?id=" + orderId
+        url: "/pages/wuliu/index?expressInfo=" + that.data.expressInfo
       })
     },
     confirmBtnTap:function(e){

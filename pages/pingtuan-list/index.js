@@ -3,43 +3,28 @@ Page({
   data: {
     pics: {}
   },
-  onLoad: function () {
+  onLoad: function (e) {
     var that = this;
+
+    var type = e.id;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/shop/goods/list',
+      url: app.globalData.urls + "/MyBill.asmx/GetMyBillList",
+      method: "POST",
+      header: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: {
+        TypeId: '2'
+      },
       success: function (res) {
-        if (res.data.code == 0) {
-          var ptgoods = [];
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].pingtuan == true) {
-              ptgoods.push(res.data.data[i]);
-              that.getgoods(res.data.data[i].id);
-            }
-          }
+        if (res.data.state == 1) {
+          
           that.setData({
             ptgoods: ptgoods
           });
         }
       },
-    })
-  },
-  getgoods: function (id) {
-    var that = this
-    var pics = that.data.pics
-    wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/set',
-      data: {
-        goodsId: id
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          pics[id] = res.data.data
-          that.setData({
-            pics: pics,
-          });
-        }
-      }
     })
   },
   toDetailsTap: function (e) {

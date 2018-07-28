@@ -140,7 +140,7 @@ page {
 
 .swiper_box, .slide-image, .swiper_box {
   width: 100%;
-  height: 115px;
+  height: 85px;
   border-radius: 5px;
 }
 
@@ -148,7 +148,7 @@ page {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 46rpx;
+  bottom: 5rpx;
   display: flex;
   justify-content: center;
 }
@@ -170,6 +170,7 @@ page {
 
 .type-menu {
   margin: 0 auto;
+  margin-top: 20rpx;
   transition: all 0.3s;
 }
 

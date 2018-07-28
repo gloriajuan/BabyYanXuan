@@ -20,7 +20,7 @@
   <view class="score-center">
     <view bindtap="{{ci == 0 ? 'scoresign':'error'}}" class="{{ci == 0 ? 'score-btn':'score-btn-none'}}">{{ci == 0 ? '签到':'已签到'}}</view>
   </view>
-  <view class="score-share">
+  <view class="score-share" hidden='true'>
     <view class="share-list">
       <image class="share-img" src="../../images/shopping.png"></image>
       <view class="share-title">消费购物</view>
